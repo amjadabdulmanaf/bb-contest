@@ -43,7 +43,7 @@
           @if (nextMatches().length > 0) {
           <span
             class="text-[0.68rem] md:text-[0.88rem] text-amber-500 font-extrabold uppercase tracking-wide bg-amber-500/10 px-2.5 py-0.5 md:px-3 md:py-1 rounded-full">
-            📅 {{ nextMatches()[0].dateTime | date:'dd MMM yyyy':'IST' }}
+            📅 {{ nextMatches()[0].dateTime | date:'dd MMM yyyy' }} {{ userTimezone() }}
           </span>
           }
         </div>
@@ -85,8 +85,7 @@
                     Group {{ match.group }}
                     }
                   </span>
-                  <span class="text-[0.68rem] md:text-[0.75rem] text-gray-500">🕒 {{ match.dateTime | date:'hh:mm
-                    a':'IST' }}</span>
+                  <span class="text-[0.68rem] md:text-[0.75rem] text-gray-500">🕒 {{ match.dateTime | date:'hh:mm a' }} {{ userTimezone() }}</span>
                 </div>
               </div>
 

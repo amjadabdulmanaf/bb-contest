@@ -136,7 +136,7 @@
                 Correctly predicting the match finish time (Normal Time / Extra Time / Penalty
                 Shootout) for knockout fixtures.
               </li>
-              <li>🔒 Predictions strictly lock at the match kick-off time (in IST).</li>
+              <li>🔒 Predictions strictly lock at the match kick-off time ({{ userTimezone() }}).</li>
             </ul>
           </div>
         }
@@ -178,7 +178,7 @@
                     <span
                       class="inline-flex items-center gap-1.5 text-[#00f2fe] bg-[#00f2fe]/8 border border-[#00f2fe]/20 rounded-full py-0.5 px-2.5 font-bold tracking-[0.3px] whitespace-nowrap shadow-[0_0_8px_rgba(0,242,254,0.05)]"
                     >
-                      🕒 IST: {{ fixture.dateTime | date: 'dd MMM, hh:mm a' : 'IST' }}
+                      🕒 {{ userTimezone() }}: {{ fixture.dateTime | date: 'dd MMM, hh:mm a' }}
                     </span>
                   </div>
 

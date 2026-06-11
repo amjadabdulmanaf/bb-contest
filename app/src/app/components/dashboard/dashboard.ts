@@ -45,9 +45,40 @@ export class DashboardComponent implements OnInit {
   readonly savingPrediction = signal<boolean>(false);
   readonly predictionStatus = signal<{ success: boolean; message: string } | null>(null);
   validatedIncompleteMatchIds = new Set<string>();
+  readonly userTimezone = signal<string>('UTC');
+
+  private getUserTimezone(): string {
+    try {
+      const d = new Date();
+      const shortVal = new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' })
+        .formatToParts(d)
+        .find(p => p.type === 'timeZoneName')?.value;
+
+      if (shortVal && !/[+-:\d]/.test(shortVal)) {
+        return shortVal;
+      }
+
+      const longVal = new Intl.DateTimeFormat(undefined, { timeZoneName: 'long' })
+        .formatToParts(d)
+        .find(p => p.type === 'timeZoneName')?.value;
+
+      if (longVal) {
+        if (longVal === 'Coordinated Universal Time') return 'UTC';
+        const initials = longVal.replace(/GMT[+-]\d+(:\d+)?/, '').match(/\b[A-Z]/g)?.join('');
+        if (initials && initials.length >= 2) {
+          return initials;
+        }
+        return longVal;
+      }
+      return shortVal || 'Local';
+    } catch (e) {
+      return 'Local';
+    }
+  }
 
   async ngOnInit(): Promise<void> {
     if (this.isBrowser) {
+      this.userTimezone.set(this.getUserTimezone());
       await this.loadDashboardData();
     }
   }
@@ -91,15 +122,16 @@ export class DashboardComponent implements OnInit {
         .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
 
       if (pendingMatches.length > 0) {
-        // Helper to get IST date string (YYYY-MM-DD)
-        const getISTDateString = (date: Date): string => {
-          const tzOffset = 5.5 * 60 * 60 * 1000; // 5h 30m in ms
-          const istTime = new Date(date.getTime() + tzOffset);
-          return istTime.toISOString().split('T')[0];
+        // Helper to get local date string (YYYY-MM-DD)
+        const getLocalDateString = (date: Date): string => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
         };
 
-        const targetDate = getISTDateString(new Date(pendingMatches[0].dateTime));
-        const nextMatches = pendingMatches.filter(m => getISTDateString(new Date(m.dateTime)) === targetDate);
+        const targetDate = getLocalDateString(new Date(pendingMatches[0].dateTime));
+        const nextMatches = pendingMatches.filter(m => getLocalDateString(new Date(m.dateTime)) === targetDate);
         this.nextMatches.set(nextMatches);
 
         const predictionsList: UserPrediction[] = nextMatches.map(m => {

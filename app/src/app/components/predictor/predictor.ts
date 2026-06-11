@@ -190,6 +190,36 @@ export class PredictorComponent implements OnInit {
   readonly saving = signal<boolean>(false);
   readonly saveStatus = signal<{ success: boolean; message: string } | null>(null);
   validatedIncompleteFixtureIds = new Set<string>();
+  readonly userTimezone = signal<string>('UTC');
+
+  private getUserTimezone(): string {
+    try {
+      const d = new Date();
+      const shortVal = new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' })
+        .formatToParts(d)
+        .find(p => p.type === 'timeZoneName')?.value;
+
+      if (shortVal && !/[+-:\d]/.test(shortVal)) {
+        return shortVal;
+      }
+
+      const longVal = new Intl.DateTimeFormat(undefined, { timeZoneName: 'long' })
+        .formatToParts(d)
+        .find(p => p.type === 'timeZoneName')?.value;
+
+      if (longVal) {
+        if (longVal === 'Coordinated Universal Time') return 'UTC';
+        const initials = longVal.replace(/GMT[+-]\d+(:\d+)?/, '').match(/\b[A-Z]/g)?.join('');
+        if (initials && initials.length >= 2) {
+          return initials;
+        }
+        return longVal;
+      }
+      return shortVal || 'Local';
+    } catch (e) {
+      return 'Local';
+    }
+  }
 
   onLogout(): void {
     this.authService.logout();
@@ -197,6 +227,7 @@ export class PredictorComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isBrowser) {
+      this.userTimezone.set(this.getUserTimezone());
       this.loadPredictorData();
     }
   }
