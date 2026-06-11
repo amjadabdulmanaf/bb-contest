@@ -24,7 +24,7 @@ export class AuthService {
   // Dynamic API Base URL detection
   private readonly apiBase = this.isBrowser && window.location.hostname === 'localhost'
     ? 'http://localhost:3000/api'
-    : 'https://api.worldcuppredictor.in/api';
+    : 'https://apibb.worldcuppredictor.in/api';
 
   // State signals
   readonly currentUser = signal<User | null>(null);

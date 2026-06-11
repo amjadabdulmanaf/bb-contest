@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://api.worldcuppredictor.in/api/:path*"
+      "destination": "https://apibb.worldcuppredictor.in/api/:path*"
     }
   ]
 }

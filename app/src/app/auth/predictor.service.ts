@@ -74,7 +74,7 @@ export class PredictorService {
 
   private readonly apiBase = this.isBrowser && window.location.hostname === 'localhost'
     ? 'http://localhost:3000/api'
-    : 'https://api.worldcuppredictor.in/api';
+    : 'https://apibb.worldcuppredictor.in/api';
 
   async getSchedule(): Promise<{ teams: Team[]; matches: Match[] }> {
     return firstValueFrom(this.http.get<{ teams: Team[]; matches: Match[] }>(`${this.apiBase}/predictions/schedule`));
