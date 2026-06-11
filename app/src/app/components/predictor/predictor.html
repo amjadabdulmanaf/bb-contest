@@ -1,0 +1,789 @@
+<div
+  class="min-h-screen w-full bg-[#030305] bg-predictor-glow relative overflow-x-hidden font-sans text-gray-100 pb-[110px] m-0 box-border"
+>
+  <!-- Decorative SVG Concentric Rings Overlay -->
+  <div
+    class="absolute top-0 left-0 w-[600px] h-[600px] pointer-events-none opacity-[0.03] z-0 overflow-hidden"
+  >
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-white">
+      <circle cx="100" cy="100" r="80" fill="none" stroke="currentColor" stroke-width="0.5" />
+      <circle
+        cx="100"
+        cy="100"
+        r="60"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="0.5"
+        stroke-dasharray="3 3"
+      />
+      <circle
+        cx="100"
+        cy="100"
+        r="40"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="0.5"
+        stroke-dasharray="1 1"
+      />
+      <path d="M20,100 L180,100" stroke="currentColor" stroke-width="0.25" />
+      <path d="M100,20 L100,180" stroke="currentColor" stroke-width="0.25" />
+    </svg>
+  </div>
+  <!-- Glowing Background Elements -->
+  <div
+    class="absolute rounded-full blur-[90px] z-[1] opacity-20 w-[450px] h-[450px] bg-[radial-gradient(circle,#ef4444_0%,transparent_70%)] top-[10%] left-[-5%]"
+  ></div>
+  <div
+    class="absolute rounded-full blur-[90px] z-[1] opacity-20 w-[500px] h-[500px] bg-[radial-gradient(circle,#8b5cf6_0%,transparent_70%)] bottom-[10%] right-[-5%]"
+  ></div>
+
+  <div class="max-w-[1440px] mx-auto px-2.5 sm:px-5 relative z-10 pt-6 md:pt-8">
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-20 px-0 text-[#9ca3af] gap-[15px]">
+        <div
+          class="w-[45px] h-[45px] border-[3.5px] border-white/5 border-t-red-500 rounded-full animate-spin"
+        ></div>
+        <p>Loading scheduled fixtures...</p>
+      </div>
+    } @else {
+      <!-- Main Content -->
+      <div class="fixtures-content animate-fade-in-up">
+        <!-- Tabs Navigation -->
+        <div
+          class="fifa-card rounded-2xl p-1.5 mb-[25px] flex items-center gap-1 max-w-max border-none! shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+        >
+          <button
+            (click)="switchTab('fixtures')"
+            class="py-2 px-5 font-extrabold text-[0.88rem] uppercase tracking-wider transition-all relative bg-transparent border-none cursor-pointer rounded-xl"
+            [ngClass]="
+              activeTab === 'fixtures'
+                ? 'text-[#00f2fe] bg-white/5'
+                : 'text-gray-400 hover:text-gray-200'
+            "
+          >
+            📅 Fixtures
+            @if (activeTab === 'fixtures') {
+              <div
+                class="absolute bottom-0 left-[20%] right-[20%] h-[3px] bg-[#00f2fe] rounded-full shadow-[0_0_8px_#00f2fe]"
+              ></div>
+            }
+          </button>
+          <button
+            (click)="switchTab('results')"
+            class="py-2 px-5 font-extrabold text-[0.88rem] uppercase tracking-wider transition-all relative bg-transparent border-none cursor-pointer rounded-xl"
+            [ngClass]="
+              activeTab === 'results'
+                ? 'text-[#00f2fe] bg-white/5'
+                : 'text-gray-400 hover:text-gray-200'
+            "
+          >
+            🏆 Results
+            @if (activeTab === 'results') {
+              <div
+                class="absolute bottom-0 left-[20%] right-[20%] h-[3px] bg-[#00f2fe] rounded-full shadow-[0_0_8px_#00f2fe]"
+              ></div>
+            }
+          </button>
+          <button
+            (click)="switchTab('rules')"
+            class="py-2 px-5 font-extrabold text-[0.88rem] uppercase tracking-wider transition-all relative bg-transparent border-none cursor-pointer rounded-xl"
+            [ngClass]="
+              activeTab === 'rules'
+                ? 'text-[#00f2fe] bg-white/5'
+                : 'text-gray-400 hover:text-gray-200'
+            "
+          >
+            💡 Rules
+            @if (activeTab === 'rules') {
+              <div
+                class="absolute bottom-0 left-[20%] right-[20%] h-[3px] bg-[#00f2fe] rounded-full shadow-[0_0_8px_#00f2fe]"
+              ></div>
+            }
+          </button>
+        </div>
+
+        <!-- Rules / Instructions Alert (Active only when Rules tab is selected) -->
+        @if (activeTab === 'rules') {
+          <div
+            class="bg-gradient-to-br from-[#e6cba2] to-[#b39569] text-stone-900 border-none rounded-xl sm:rounded-2xl py-5 px-4 sm:px-6 mb-[20px] sm:mb-[35px] text-left font-bold shadow-[0_10px_25px_-5px_rgba(179,149,105,0.35)] animate-fade-in-up"
+          >
+            <h4 class="m-0 mb-2.5 text-base font-extrabold text-stone-950">
+              💡 Prediction Point Rules
+            </h4>
+            <ul class="m-0 pl-5 flex flex-col gap-2 text-[0.88rem] text-stone-800 list-disc">
+              <li>
+                🎯
+                <strong class="text-stone-950 font-extrabold">Exact Score (+30 pts):</strong>
+                Correct Match Result AND correct exact scoreline (including correct shootout winner
+                for draw knockout fixtures).
+              </li>
+              <li>
+                👍
+                <strong class="text-stone-950 font-extrabold">Match Result (+10 pts):</strong>
+                Correct Match Result (Home Win / Away Win / Draw) but incorrect scoreline.
+              </li>
+              <li>
+                ⚽
+                <strong class="text-stone-950 font-extrabold">Goal Scorer (+10 pts):</strong>
+                Correct goal scorer prediction (any player from actual scorers list, or "No Goal
+                Scorers" for a 0-0 goalless draw).
+              </li>
+              <li>
+                ⏱
+                <strong class="text-stone-950 font-extrabold"
+                  >Knockout Resolution (+10 pts):</strong
+                >
+                Correctly predicting the match finish time (Normal Time / Extra Time / Penalty
+                Shootout) for knockout fixtures.
+              </li>
+              <li>🔒 Predictions strictly lock at the match kick-off time (in IST).</li>
+            </ul>
+          </div>
+        }
+
+        @if (activeTab !== 'rules') {
+          <!-- Controls Bar -->
+          @if (activeTab === 'fixtures') {
+            <div class="flex justify-end mb-[25px]">
+              <button
+                (click)="quickFill()"
+                class="w-full sm:w-auto bg-gradient-to-br from-amber-500 to-amber-700 text-white border-none rounded-lg py-2 px-4 sm:py-2.5 sm:px-[18px] text-xs sm:text-[0.88rem] font-bold cursor-pointer shadow-[0_4px_12px_rgba(245,158,11,0.2)] transition-all duration-300 hover:from-amber-400 hover:to-amber-700 hover:-translate-y-[1px] hover:shadow-[0_6px_15px_rgba(245,158,11,0.35)] active:translate-y-0 flex items-center justify-center gap-2"
+              >
+                <span>⚡ Quick Fill Predictions</span>
+              </button>
+            </div>
+          }
+
+          <!-- Fixture List -->
+          <div class="flex flex-col lg:grid lg:grid-cols-2 gap-4">
+            @for (fixture of filteredFixtures; track fixture.id) {
+              <div
+                class="relative fifa-card rounded-xl sm:rounded-2xl p-3.5 md:py-[18px] md:px-6 flex flex-col gap-4 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] transition-all duration-300 hover:-translate-y-[2px]"
+                [ngClass]="getFixtureCardClass(fixture)"
+                [class.z-50]="activeSearchMatchId === fixture.id"
+              >
+                <!-- Match Info Top Row -->
+                <div
+                  class="w-full flex items-center justify-between text-[0.72rem] sm:text-xs border-b border-white/5 pb-2 mb-3 gap-2"
+                >
+                  <!-- Left: Match Number -->
+                  <div class="flex-1 text-left">
+                    <span class="text-[0.75rem] font-bold text-gray-500 uppercase tracking-[0.5px]">
+                      Match #{{ fixture.matchNumber }}
+                    </span>
+                  </div>
+
+                  <!-- Center: Highlighted Date/Time -->
+                  <div class="flex-initial text-center">
+                    <span
+                      class="inline-flex items-center gap-1.5 text-[#00f2fe] bg-[#00f2fe]/8 border border-[#00f2fe]/20 rounded-full py-0.5 px-2.5 font-bold tracking-[0.3px] whitespace-nowrap shadow-[0_0_8px_rgba(0,242,254,0.05)]"
+                    >
+                      🕒 IST: {{ fixture.dateTime | date: 'dd MMM, hh:mm a' : 'IST' }}
+                    </span>
+                  </div>
+
+                  <!-- Right: Group/Stage Info -->
+                  <div class="flex-1 text-right">
+                    <span class="text-[0.8rem] font-bold text-white uppercase tracking-[0.5px]">
+                      @if (fixture.type === 'knockout') {
+                        {{ fixture.group || 'Knockout Stage' }}
+                      } @else {
+                        Group {{ fixture.group }}
+                      }
+                    </span>
+                  </div>
+                </div>
+                <div class="w-full py-1">
+                  <!-- Center: Teams comparison -->
+                  <div class="w-full flex items-center justify-between gap-3 sm:gap-6">
+                    <!-- Home Team -->
+                    <div
+                      class="flex-1 min-w-0 flex flex-col items-center justify-center gap-1 sm:gap-1.5 text-center transition-all duration-300"
+                      [ngClass]="{
+                        'grayscale opacity-40': getTeamState(fixture, 'home') === 'loser',
+                      }"
+                    >
+                      <span
+                        class="text-[1.5rem] md:text-[2.2rem] filter drop-shadow-[0_4px_8_rgba(0,0,0,0.3)] leading-none shrink-0 inline-flex items-center gap-1"
+                      >
+                        <span>{{ fixture.homeTeam?.flag }}</span>
+                        @if (fixture.homeTeam?.fifaRanking) {
+                          <span
+                            class="text-[0.62rem] md:text-[0.75rem] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1 rounded select-none"
+                            title="FIFA Ranking"
+                            >#{{ fixture.homeTeam?.fifaRanking }}</span
+                          >
+                        }
+                      </span>
+                      <span
+                        class="text-[0.78rem] md:text-[0.95rem] font-extrabold text-white leading-tight text-center whitespace-normal w-full"
+                        [title]="fixture.homeTeam?.name"
+                        >{{ fixture.homeTeam?.name }}</span
+                      >
+                    </div>
+
+                    <!-- Prediction / Actual Score -->
+                    <div class="flex-initial shrink-0 flex justify-center py-1 md:py-0">
+                      <!-- If match is not locked (Open for editing) -->
+                      @if (!fixture.isLocked) {
+                        <div class="flex items-center gap-1 md:gap-2">
+                          <input
+                            type="number"
+                            class="w-9 h-9 md:w-[42px] md:h-[42px] bg-white/2 border-[1.5px] border-white/8 rounded-lg text-sm md:text-[1.1rem] font-bold text-white text-center outline-none transition-all duration-200 focus:border-blue-500 focus:bg-blue-500/4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            [ngClass]="{
+                              'border-rose-500/60 focus:border-rose-500':
+                                shouldShowValidationError(fixture.id) &&
+                                localScores[fixture.id].homeScore === null,
+                            }"
+                            [(ngModel)]="localScores[fixture.id].homeScore"
+                            (ngModelChange)="onScoreInput(fixture.id)"
+                            placeholder="-"
+                            min="0"
+                            max="99"
+                          />
+                          <span
+                            class="text-[0.7rem] md:text-[0.8rem] text-gray-600 tracking-[0.5px] px-0.5 md:px-1"
+                            >VS</span
+                          >
+                          <input
+                            type="number"
+                            class="w-9 h-9 md:w-[42px] md:h-[42px] bg-white/2 border-[1.5px] border-white/8 rounded-lg text-sm md:text-[1.1rem] font-bold text-white text-center outline-none transition-all duration-200 focus:border-blue-500 focus:bg-blue-500/4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            [ngClass]="{
+                              'border-rose-500/60 focus:border-rose-500':
+                                shouldShowValidationError(fixture.id) &&
+                                localScores[fixture.id].awayScore === null,
+                            }"
+                            [(ngModel)]="localScores[fixture.id].awayScore"
+                            (ngModelChange)="onScoreInput(fixture.id)"
+                            placeholder="-"
+                            min="0"
+                            max="99"
+                          />
+                        </div>
+                      } @else {
+                        <!-- Locked / Completed display -->
+                        <div
+                          class="flex items-center gap-1.5 md:gap-3 bg-white/2 border border-dashed border-white/6 rounded-lg py-1 px-1.5 md:py-1.5 md:px-3"
+                        >
+                          <!-- User Prediction -->
+                          <div class="flex flex-col items-center">
+                            <span
+                              class="text-[0.5rem] md:text-[0.62rem] uppercase text-gray-600 font-bold tracking-[0.3px] mb-0.5"
+                              >Your Pred</span
+                            >
+                            <span
+                              class="text-[0.7rem] md:text-[0.95rem] font-extrabold text-[#9ca3af]"
+                            >
+                              {{
+                                localScores[fixture.id].homeScore !== null
+                                  ? localScores[fixture.id].homeScore
+                                  : '-'
+                              }}
+                              :
+                              {{
+                                localScores[fixture.id].awayScore !== null
+                                  ? localScores[fixture.id].awayScore
+                                  : '-'
+                              }}
+                            </span>
+                          </div>
+
+                          <span class="text-gray-600 font-bold text-[0.7rem] md:text-base">|</span>
+
+                          <!-- Actual Score (if completed) -->
+                          <div class="flex flex-col items-center">
+                            <span
+                              class="text-[0.5rem] md:text-[0.62rem] uppercase text-gray-600 font-bold tracking-[0.3px] mb-0.5"
+                              >Actual Score</span
+                            >
+                            <span class="text-[0.7rem] md:text-[0.95rem] font-extrabold text-white">
+                              @if (fixture.status === 'completed') {
+                                {{ fixture.homeScore }} : {{ fixture.awayScore }}
+                              } @else {
+                                - : -
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Away Team -->
+                    <div
+                      class="flex-1 min-w-0 flex flex-col items-center justify-center gap-1 sm:gap-1.5 text-center transition-all duration-300"
+                      [ngClass]="{
+                        'grayscale opacity-40': getTeamState(fixture, 'away') === 'loser',
+                      }"
+                    >
+                      <span
+                        class="text-[1.5rem] md:text-[2.2rem] filter drop-shadow-[0_4px_8_rgba(0,0,0,0.2)] leading-none shrink-0 inline-flex items-center gap-1"
+                      >
+                        <span>{{ fixture.awayTeam?.flag }}</span>
+                        @if (fixture.awayTeam?.fifaRanking) {
+                          <span
+                            class="text-[0.62rem] md:text-[0.75rem] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1 rounded select-none"
+                            title="FIFA Ranking"
+                            >#{{ fixture.awayTeam?.fifaRanking }}</span
+                          >
+                        }
+                      </span>
+                      <span
+                        class="text-[0.78rem] md:text-[0.95rem] font-extrabold text-white leading-tight text-center whitespace-normal w-full"
+                        [title]="fixture.awayTeam?.name"
+                        >{{ fixture.awayTeam?.name }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bottom Row: Goal Scorer Prediction & Status Badge -->
+                <div
+                  class="pt-2.5 border-t border-white/5 w-full flex flex-row items-center justify-between gap-3 text-[0.72rem] md:text-xs"
+                >
+                  <!-- Left: Scorer selector aligned close to label -->
+                  <div class="flex flex-row items-center gap-2 sm:gap-4 flex-grow">
+                    <span class="text-[#9ca3af] font-medium shrink-0 flex items-center gap-0.5">
+                      <span>🎯</span>
+                      <span class="hidden sm:inline">Predicted </span>Scorer:
+                    </span>
+
+                    @if (!fixture.isLocked) {
+                      <div
+                        class="relative w-full max-w-[160px] sm:max-w-[240px]"
+                        data-scorer-container="true"
+                      >
+                        <input
+                          type="text"
+                          placeholder="Select scorer..."
+                          [(ngModel)]="searchQueries[fixture.id]"
+                          (focus)="onScorerFocus(fixture)"
+                          [ngClass]="{
+                            'border-rose-500/60 focus:border-rose-500':
+                              shouldShowValidationError(fixture.id) && !localScorers[fixture.id],
+                          }"
+                          class="w-full bg-[#05070f]/50 border border-white/10 rounded-lg py-1 md:py-1.5 pl-2.5 pr-7 text-[0.72rem] md:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                        />
+                        @if (localScorers[fixture.id]) {
+                          <button
+                            (click)="clearScorer(fixture)"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white bg-transparent border-none cursor-pointer text-xs md:text-sm p-0.5 leading-none transition-colors"
+                            title="Clear prediction"
+                          >
+                            ✕
+                          </button>
+                        }
+                        @if (activeSearchMatchId === fixture.id) {
+                          <div
+                            class="absolute z-[100] left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-[#0d142a]/95 border border-white/10 rounded-lg shadow-xl backdrop-blur-md min-w-[220px] sm:min-w-[240px]"
+                          >
+                            <div
+                              class="grid grid-cols-[1.2fr_1fr_0.5fr] gap-1 px-2.5 py-1.5 text-[0.6rem] md:text-[0.62rem] font-extrabold text-gray-500 uppercase tracking-wider border-b border-white/5 bg-[#080d1d]"
+                            >
+                              <span>Player Name</span>
+                              <span>Team</span>
+                              <span class="text-right">Pos</span>
+                            </div>
+                            @for (player of getFilteredPlayers(fixture); track player.id) {
+                              <div
+                                (click)="selectScorer(fixture, player)"
+                                class="grid grid-cols-[1.2fr_1fr_0.5fr] gap-1 px-2.5 py-1.5 text-[0.7rem] md:text-xs text-gray-200 hover:bg-blue-500/20 hover:text-white cursor-pointer transition-colors border-b border-white/3 last:border-b-0"
+                              >
+                                @if (player.id === 'no-scorer') {
+                                  <span class="col-span-3 font-semibold text-blue-400">{{
+                                    player.name
+                                  }}</span>
+                                } @else {
+                                  <span class="font-semibold truncate">{{ player.name }}</span>
+                                  <span
+                                    class="text-[0.65rem] md:text-[0.68rem] text-gray-400 truncate"
+                                    >{{ getPlayerTeamName(player.teamId) }}</span
+                                  >
+                                  <span
+                                    class="text-right text-[0.65rem] md:text-[0.68rem] text-gray-500 font-mono font-bold"
+                                    >{{ player.position }}</span
+                                  >
+                                }
+                              </div>
+                            } @empty {
+                              <div class="px-2.5 py-1.5 text-[0.7rem] md:text-xs text-gray-500">
+                                No players found
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <!-- Locked / Completed Scorer details -->
+                      <div
+                        class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-grow text-[#9ca3af]"
+                      >
+                        <div class="flex items-center gap-1.5">
+                          <span
+                            class="font-semibold"
+                            [ngClass]="{
+                              'text-emerald-400 font-extrabold':
+                                fixture.status === 'completed' &&
+                                fixture.userPrediction?.predictedScorerId &&
+                                ((fixture.homeScore === 0 &&
+                                  fixture.awayScore === 0 &&
+                                  fixture.userPrediction?.predictedScorerId === 'no-scorer') ||
+                                  (fixture.actualScorers &&
+                                    fixture.actualScorers.includes(
+                                      fixture.userPrediction?.predictedScorerId
+                                    ))),
+                              'text-rose-400':
+                                fixture.status === 'completed' &&
+                                fixture.userPrediction?.predictedScorerId &&
+                                !(
+                                  (fixture.homeScore === 0 &&
+                                    fixture.awayScore === 0 &&
+                                    fixture.userPrediction?.predictedScorerId === 'no-scorer') ||
+                                  (fixture.actualScorers &&
+                                    fixture.actualScorers.includes(
+                                      fixture.userPrediction?.predictedScorerId
+                                    ))
+                                ),
+                              'text-gray-300 font-semibold':
+                                fixture.status !== 'completed' &&
+                                fixture.userPrediction?.predictedScorerId,
+                              'text-gray-500 italic': !fixture.userPrediction?.predictedScorerId,
+                            }"
+                          >
+                            {{ getPlayerName(fixture.userPrediction?.predictedScorerId) || 'None' }}
+                          </span>
+                          @if (
+                            fixture.status === 'completed' &&
+                            fixture.userPrediction?.predictedScorerId
+                          ) {
+                            @if (
+                              (fixture.homeScore === 0 &&
+                                fixture.awayScore === 0 &&
+                                fixture.userPrediction?.predictedScorerId === 'no-scorer') ||
+                              (fixture.actualScorers &&
+                                fixture.actualScorers.includes(
+                                  fixture.userPrediction?.predictedScorerId
+                                ))
+                            ) {
+                              <span
+                                class="text-emerald-400 font-extrabold"
+                                title="Correct Scorer! (+10 pts)"
+                                >✓ (+10 pts)</span
+                              >
+                            } @else {
+                              <span
+                                class="text-rose-400 font-bold"
+                                title="Incorrect Scorer (+0 pts)"
+                                >✗</span
+                              >
+                            }
+                          }
+                        </div>
+                        @if (fixture.status === 'completed') {
+                          <div
+                            class="flex items-center gap-1.5 border-t border-dashed border-white/5 pt-1.5 sm:border-t-0 sm:pt-0"
+                          >
+                            <span>⚽ Actual:</span>
+                            <span class="font-semibold text-gray-200">
+                              @if (fixture.homeScore === 0 && fixture.awayScore === 0) {
+                                No Goal Scorers
+                              } @else {
+                                @for (
+                                  scorerId of fixture.actualScorers;
+                                  track scorerId;
+                                  let last = $last
+                                ) {
+                                  {{ getPlayerName(scorerId) }}{{ !last ? ', ' : '' }}
+                                } @empty {
+                                  None
+                                }
+                              }
+                            </span>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Right Side: Status / Points badge -->
+                  <div class="flex justify-end items-center shrink-0">
+                    @if (fixture.status === 'completed') {
+                      <span
+                        class="text-[0.7rem] sm:text-[0.76rem] font-bold py-1 px-2.5 sm:py-1.25 sm:px-3 rounded-md uppercase tracking-[0.3px]"
+                        [ngClass]="{
+                          'bg-emerald-500/10 border border-emerald-500/25 text-emerald-400':
+                            fixture.pointsEarned === 30 || fixture.pointsEarned === 50,
+                          'bg-amber-500/10 border border-amber-500/25 text-amber-400':
+                            fixture.pointsEarned === 10 ||
+                            fixture.pointsEarned === 20 ||
+                            fixture.pointsEarned === 40 ||
+                            (fixture.pointsEarned === 30 &&
+                              fixture.userPrediction?.predictedScorerId !== 'no-scorer'),
+                          'bg-red-500/8 border border-red-500/20 text-red-400':
+                            fixture.pointsEarned === 0,
+                        }"
+                      >
+                        {{ fixture.pointsLabel }}
+                      </span>
+                    } @else if (fixture.isLocked) {
+                      <span
+                        class="text-[0.7rem] sm:text-[0.76rem] font-bold py-1 px-2.5 sm:py-1.25 sm:px-3 rounded-md uppercase tracking-[0.3px] bg-white/2 border border-white/8 text-gray-500"
+                        >🔒 Locked</span
+                      >
+                    } @else {
+                      @if (shouldShowValidationError(fixture.id)) {
+                        <span
+                          class="text-[0.7rem] sm:text-[0.76rem] font-bold py-1 px-2.5 sm:py-1.25 sm:px-3 rounded-md uppercase tracking-[0.3px] bg-rose-500/10 border border-rose-500/35 text-rose-400 animate-pulse"
+                        >
+                          ⚠️ Incomplete
+                        </span>
+                      } @else {
+                        <span
+                          class="text-[0.7rem] sm:text-[0.76rem] font-bold py-1 px-2.5 sm:py-1.25 sm:px-3 rounded-md uppercase tracking-[0.3px] border"
+                          [ngClass]="
+                            dirtyMatchIds.has(fixture.id)
+                              ? 'bg-amber-500/8 border-amber-500/25 text-amber-400'
+                              : 'bg-blue-500/8 border-blue-500/20 text-blue-400'
+                          "
+                        >
+                          {{ dirtyMatchIds.has(fixture.id) ? '● Unsaved Changes' : '✏ Open' }}
+                        </span>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Knockout Predictions Row (Open Match) -->
+                @if (
+                  fixture.type === 'knockout' &&
+                  !fixture.isLocked &&
+                  localScores[fixture.id].homeScore !== null &&
+                  localScores[fixture.id].awayScore !== null
+                ) {
+                  <div
+                    class="pt-2.5 border-t border-white/5 w-full flex flex-col gap-2.5 text-[0.72rem] md:text-xs"
+                  >
+                    <!-- Winner Selection (only if scores are draw) -->
+                    @if (localScores[fixture.id].homeScore === localScores[fixture.id].awayScore) {
+                      <div class="flex flex-row items-center justify-between gap-2 w-full">
+                        <span class="text-[#9ca3af] font-medium shrink-0 flex items-center gap-0.5">
+                          <span>🏆</span>
+                          <span class="hidden sm:inline">Shootout </span>Winner:
+                        </span>
+                        <div
+                          class="inline-flex rounded-lg p-0.5 bg-white/2 border border-white/8 text-[0.7rem] md:text-xs"
+                          [ngClass]="{
+                            'border-rose-500/60':
+                              shouldShowValidationError(fixture.id) && !localWinners[fixture.id],
+                          }"
+                        >
+                          <button
+                            type="button"
+                            (click)="
+                              localWinners[fixture.id] = fixture.homeTeamId;
+                              dirtyMatchIds.add(fixture.id)
+                            "
+                            [ngClass]="
+                              localWinners[fixture.id] === fixture.homeTeamId
+                                ? 'bg-amber-500 text-white font-bold'
+                                : 'bg-transparent text-gray-400 hover:text-white'
+                            "
+                            class="py-0.5 px-2 md:py-1 md:px-3 rounded-md text-[0.7rem] md:text-xs border-none cursor-pointer transition-all duration-200"
+                          >
+                            {{ fixture.homeTeam?.flag }}
+                            <span class="opacity-75 text-[0.62rem] md:text-[0.68rem]"
+                              >#{{ fixture.homeTeam?.fifaRanking || 'N/A' }}</span
+                            >
+                            {{ fixture.homeTeam?.name }}
+                          </button>
+                          <button
+                            type="button"
+                            (click)="
+                              localWinners[fixture.id] = fixture.awayTeamId;
+                              dirtyMatchIds.add(fixture.id)
+                            "
+                            [ngClass]="
+                              localWinners[fixture.id] === fixture.awayTeamId
+                                ? 'bg-amber-500 text-white font-bold'
+                                : 'bg-transparent text-gray-400 hover:text-white'
+                            "
+                            class="py-0.5 px-2 md:py-1 md:px-3 rounded-md text-[0.7rem] md:text-xs border-none cursor-pointer transition-all duration-200"
+                          >
+                            {{ fixture.awayTeam?.name }}
+                            <span class="opacity-75 text-[0.62rem] md:text-[0.68rem]"
+                              >#{{ fixture.awayTeam?.fifaRanking || 'N/A' }}</span
+                            >
+                            {{ fixture.awayTeam?.flag }}
+                          </button>
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Resolution Time Selection -->
+                    <div class="flex flex-row items-center justify-between gap-2 w-full">
+                      <span class="text-[#9ca3af] font-medium shrink-0 flex items-center gap-0.5">
+                        <span>⏱</span>
+                        <span class="hidden sm:inline">Game </span>Finishes In:
+                      </span>
+                      @if (
+                        localScores[fixture.id].homeScore === localScores[fixture.id].awayScore
+                      ) {
+                        <span
+                          class="bg-amber-500/10 border border-amber-500/25 text-amber-400 rounded-md py-0.5 px-2 font-semibold text-[0.7rem] md:text-[0.76rem]"
+                        >
+                          Penalty Shootout
+                        </span>
+                      } @else {
+                        <select
+                          [ngModel]="localResolutionTimes[fixture.id] || 'Normal Time'"
+                          (ngModelChange)="
+                            localResolutionTimes[fixture.id] = $event; dirtyMatchIds.add(fixture.id)
+                          "
+                          class="bg-[#05070f]/50 border border-white/10 rounded-lg py-0.5 px-1.5 md:py-1 md:px-2 text-[0.7rem] md:text-xs text-white focus:outline-none focus:border-blue-500"
+                        >
+                          <option value="Normal Time" class="bg-[#0d142a] text-white">
+                            Normal Time
+                          </option>
+                          <option value="Extra Time" class="bg-[#0d142a] text-white">
+                            Extra Time
+                          </option>
+                        </select>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Knockout Predictions Display Row (Locked / Completed Match) -->
+                @if (fixture.type === 'knockout' && fixture.isLocked) {
+                  <div
+                    class="pt-2.5 border-t border-white/5 w-full flex flex-col gap-2.5 text-xs text-[#9ca3af]"
+                  >
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-6 w-full">
+                      <!-- Predicted Winner & Time Display -->
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span>🏆 Predicted Winner:</span>
+                        <span class="font-semibold text-gray-200">
+                          {{
+                            getPlayerTeamName(fixture.userPrediction?.predictedWinnerId || '') ||
+                              '-'
+                          }}
+                        </span>
+                        @if (fixture.status === 'completed') {
+                          @if (
+                            fixture.userPrediction?.predictedWinnerId === fixture.actualWinnerId
+                          ) {
+                            <span class="text-emerald-400 font-extrabold text-[0.7rem] sm:text-xs"
+                              >✓ (Correct)</span
+                            >
+                          } @else {
+                            <span class="text-rose-400 font-bold text-[0.7rem] sm:text-xs"
+                              >✗ (Incorrect)</span
+                            >
+                          }
+                        }
+                      </div>
+
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span>⏱ Predicted Time:</span>
+                        <span class="font-semibold text-gray-200">
+                          {{ fixture.userPrediction?.predictedResolutionTime || '-' }}
+                        </span>
+                        @if (fixture.status === 'completed') {
+                          @if (
+                            fixture.userPrediction?.predictedResolutionTime ===
+                            fixture.resolutionTime
+                          ) {
+                            <span class="text-emerald-400 font-extrabold text-[0.7rem] sm:text-xs"
+                              >✓ (+10 pts)</span
+                            >
+                          } @else {
+                            <span class="text-rose-400 font-bold text-[0.7rem] sm:text-xs">✗</span>
+                          }
+                        }
+                      </div>
+                    </div>
+
+                    @if (fixture.status === 'completed') {
+                      <div
+                        class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-6 w-full pt-1.5 border-t border-dashed border-white/4"
+                      >
+                        <!-- Actual Winner & Time Display -->
+                        <div class="flex items-center gap-1.5">
+                          <span>🏆 Actual Winner:</span>
+                          <span class="font-semibold text-white">
+                            {{ getPlayerTeamName(fixture.actualWinnerId || '') || '-' }}
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                          <span>⏱ Match Finished In:</span>
+                          <span class="font-semibold text-white">
+                            {{ fixture.resolutionTime || '-' }}
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            } @empty {
+              <div
+                class="bg-white/2 border border-dashed border-white/5 rounded-2xl p-10 text-center text-gray-500 font-semibold"
+              >
+                @if (activeTab === 'fixtures') {
+                  No upcoming fixtures available.
+                } @else {
+                  No completed match results available.
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Floating Unsaved Changes Footer Bar -->
+      @if (dirtyMatchIds.size > 0 || saveStatus()) {
+        <div
+          class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-20px)] sm:w-[calc(100%-40px)] max-w-[1400px] bg-[#0d142a]/85 backdrop-blur-[25px] border-[1.5px] border-blue-500/25 rounded-xl sm:rounded-[20px] py-3 px-4 sm:py-4 sm:px-7 shadow-[0_20px_45px_rgba(0,0,0,0.5),0_0_25px_rgba(59,130,246,0.15)] z-[999] animate-slide-up"
+        >
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-5 w-full">
+            @if (dirtyMatchIds.size > 0) {
+              <p
+                class="text-[0.8rem] sm:text-[0.92rem] font-medium text-gray-200 m-0 text-center sm:text-left"
+              >
+                ⚠️ You have
+                <strong class="font-bold text-white">{{ dirtyMatchIds.size }}</strong> unsaved
+                fixture prediction changes!
+              </p>
+            } @else if (saveStatus()) {
+              <p
+                class="text-[0.8rem] sm:text-[0.92rem] font-medium m-0 text-center sm:text-left"
+                [ngClass]="saveStatus()?.success ? 'text-emerald-400' : 'text-red-400'"
+              >
+                {{ saveStatus()?.message }}
+              </p>
+            }
+            <div class="flex items-center justify-center gap-3 w-full sm:w-auto">
+              <button
+                (click)="loadPredictorData()"
+                class="w-1/2 sm:w-auto text-xs sm:text-[0.88rem] py-2 px-3 sm:py-2.5 sm:px-[18px] bg-transparent border border-white/15 text-gray-300 rounded-lg font-semibold cursor-pointer transition-all duration-200 hover:bg-white/5 hover:border-white/25"
+                [disabled]="saving()"
+              >
+                Reset
+              </button>
+              <button
+                (click)="saveAllPredictions()"
+                class="w-1/2 sm:w-auto text-xs sm:text-[0.88rem] py-2 px-4 sm:py-2.5 sm:px-[22px] bg-blue-500 text-white border-none rounded-lg font-semibold cursor-pointer shadow-[0_4px_12px_rgba(59,130,246,0.2)] transition-all duration-200 hover:bg-blue-600 hover:-translate-y-[1px] hover:shadow-[0_6px_15px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="saving()"
+              >
+                @if (saving()) {
+                  Saving...
+                } @else {
+                  💾 Save Predictions
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

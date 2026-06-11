@@ -1,0 +1,7 @@
+[2026-06-07T10:14:24.207Z] To: user1@worldcup.com | Link: http://localhost:4200/set-password?token=dec03ff32f83934739f95ea986280c9f7c6ae9f20c2d2a98cb961e8c7df05ef4
+[2026-06-07T13:17:39.520Z] To: user1@worldcup.com | Link: http://localhost:4200/set-password?token=ba071de122a31c45b04759c503ced8aaa8cb818a7077e2218bf8238da21748a7
+[2026-06-07T18:52:20.720Z] To: user1@worldcup.com | Link: http://localhost:4200/set-password?token=7bdc89d9d04d5e70f1f8ee486e90edc0d3e1a08d5e11537aeef343146dd095ce
+[2026-06-08T14:36:22.900Z] To: amjad@reflectionsinfos.com | Link: http://localhost:4200/set-password?token=638032a66b2068f2925505dd446198ea022f9e845c9715b66973a44e03e16c01
+[2026-06-08T15:42:42.079Z] To: amjad@reflectionsinfos.com | Link: http://localhost:4200/set-password?token=749308f8a410e4db37c9b2827f6528e539eccc555665a3f515001efd5ddd4c7e
+[2026-06-08T16:10:50.199Z] To: amjad@reflectionsinfos.com | Link: http://localhost:4200/set-password?token=f90d6010ff8d5be11d3320870a26e66bcdf84cc015feb38fc9f254eb35414221
+[2026-06-09T22:45:32.254Z] To: amjad@reflectionsinfos.com | Link: http://localhost:4200/set-password?token=dcdac5c80772aa93a17fcdc64bca386ecc1bf267fac92b62c2f8ad17a29fc29f

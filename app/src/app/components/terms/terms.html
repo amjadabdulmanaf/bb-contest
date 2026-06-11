@@ -1,0 +1,213 @@
+<div class="min-h-screen w-full bg-[#030305] bg-dashboard-glow relative overflow-x-hidden font-sans text-gray-100 pb-[60px] m-0 box-border">
+  <!-- Decorative SVG Concentric Rings Overlay -->
+  <div class="absolute top-0 right-0 w-[600px] h-[600px] pointer-events-none opacity-[0.035] z-0 overflow-hidden">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-white">
+      <circle cx="100" cy="100" r="80" fill="none" stroke="currentColor" stroke-width="0.5" />
+      <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3" />
+      <circle cx="100" cy="100" r="40" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="1 1" />
+    </svg>
+  </div>
+
+  <div class="max-w-[1440px] mx-auto px-2.5 sm:px-6 relative z-10 pt-6 md:pt-8">
+
+    <!-- Page Header -->
+    <div class="flex items-center gap-3 mb-8">
+      <a routerLink="/dashboard" class="flex items-center gap-1.5 text-[0.82rem] text-gray-500 hover:text-[#00f2fe] transition-colors no-underline font-semibold shrink-0">
+        ← Back
+      </a>
+      <div class="h-4 w-px bg-white/10"></div>
+      <h1 class="text-[1.3rem] sm:text-[1.6rem] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 via-white to-amber-500 bg-clip-text text-transparent m-0 leading-tight">
+        📜 Terms & Conditions
+      </h1>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="fifa-card rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 animate-fade-in-up">
+
+      <!-- Effective Date -->
+      <div class="flex items-center gap-2 mb-6 pb-4 border-b border-white/5">
+        <span class="bg-amber-500/10 border border-amber-500/25 text-amber-400 rounded-lg py-1 px-3 text-[0.72rem] font-bold uppercase tracking-[0.5px]">
+          Effective: June 2026
+        </span>
+        <span class="text-[0.72rem] text-gray-500">FIFA World Cup 2026™ Prediction Contest</span>
+      </div>
+
+      <!-- Section 1: General Terms -->
+      <section class="mb-8">
+        <h2 class="text-[1.05rem] sm:text-[1.15rem] font-extrabold text-white mb-4 flex items-center gap-2">
+          <span class="w-7 h-7 bg-blue-500/10 border border-blue-500/20 rounded-lg inline-flex items-center justify-center text-[0.85rem]">1</span>
+          General Terms
+        </h2>
+        <div class="flex flex-col gap-3 pl-2 sm:pl-4 border-l-2 border-white/5">
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            By accessing and using the <strong class="text-white">FIFA World Cup 2026™ Prediction Portal</strong>, you agree to be bound by these Terms and Conditions. This platform is exclusively for registered employees and authorized participants of <strong class="text-amber-400">Reflections Sports Club</strong>.
+          </p>
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            Participation in this prediction contest is <strong class="text-white">voluntary</strong> and intended purely for entertainment and recreational purposes. No monetary gambling or wagering of any kind is involved.
+          </p>
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            You are responsible for keeping your login credentials confidential. Any activity performed under your account is your responsibility.
+          </p>
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            The organizers reserve the right to modify, suspend, or terminate the contest or any participant's access at any time, without prior notice, for any reason including but not limited to suspected misuse, technical failure, or unforeseen circumstances.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 2: Game Rules -->
+      <section class="mb-8">
+        <h2 class="text-[1.05rem] sm:text-[1.15rem] font-extrabold text-white mb-4 flex items-center gap-2">
+          <span class="w-7 h-7 bg-emerald-500/10 border border-emerald-500/20 rounded-lg inline-flex items-center justify-center text-[0.85rem]">2</span>
+          Game Rules & Scoring System
+        </h2>
+        <div class="flex flex-col gap-4 pl-2 sm:pl-4 border-l-2 border-white/5">
+
+          <!-- Prediction Rules -->
+          <div>
+            <h3 class="text-[0.88rem] font-bold text-white mb-2">Prediction Submission</h3>
+            <ul class="flex flex-col gap-1.5 pl-4 m-0 text-[0.82rem] sm:text-[0.85rem] text-gray-300 leading-relaxed list-disc">
+              <li>Participants can predict the score for each match before its scheduled kick-off time (in IST).</li>
+              <li>Once a match has kicked off, predictions for that match are <strong class="text-red-400">permanently locked</strong> and cannot be modified.</li>
+              <li>Each prediction must include: the predicted home score, the predicted away score, and a predicted first goal scorer.</li>
+              <li>For knockout stage matches that result in a draw, participants must additionally predict the penalty shootout winner and the match resolution time.</li>
+            </ul>
+          </div>
+
+          <!-- Scoring Table -->
+          <div>
+            <h3 class="text-[0.88rem] font-bold text-white mb-3">Points Allocation</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse text-left">
+                <thead>
+                  <tr>
+                    <th class="p-2.5 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/8 bg-white/[0.01]">Criteria</th>
+                    <th class="p-2.5 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/8 bg-white/[0.01] text-center w-20">Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="p-2.5 sm:p-3 text-[0.8rem] sm:text-[0.85rem] text-gray-200 border-b border-white/3">
+                      <strong class="text-emerald-400">Exact Score</strong> — Predicted score matches the final result exactly
+                    </td>
+                    <td class="p-2.5 sm:p-3 text-[0.95rem] text-emerald-400 font-extrabold text-center border-b border-white/3">30</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 sm:p-3 text-[0.8rem] sm:text-[0.85rem] text-gray-200 border-b border-white/3">
+                      <strong class="text-blue-400">Correct Result</strong> — Predicted the correct outcome (win/draw) but not the exact score
+                    </td>
+                    <td class="p-2.5 sm:p-3 text-[0.95rem] text-blue-400 font-extrabold text-center border-b border-white/3">10</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 sm:p-3 text-[0.8rem] sm:text-[0.85rem] text-gray-200 border-b border-white/3">
+                      <strong class="text-amber-400">Correct Goal Scorer</strong> — Predicted first goal scorer appears in the actual scorers list
+                    </td>
+                    <td class="p-2.5 sm:p-3 text-[0.95rem] text-amber-400 font-extrabold text-center border-b border-white/3">10</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 sm:p-3 text-[0.8rem] sm:text-[0.85rem] text-gray-200 border-b border-white/3">
+                      <strong class="text-purple-400">Correct Resolution Time</strong> <span class="text-[0.72rem] text-gray-500">(Knockout only)</span> — Predicted correct match resolution time (Normal Time / Extra Time / Penalty Shootout)
+                    </td>
+                    <td class="p-2.5 sm:p-3 text-[0.95rem] text-purple-400 font-extrabold text-center border-b border-white/3">10</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 sm:p-3 text-[0.8rem] sm:text-[0.85rem] text-gray-200 border-b border-white/3">
+                      <strong class="text-gray-500">Incorrect Prediction</strong> — Wrong match outcome
+                    </td>
+                    <td class="p-2.5 sm:p-3 text-[0.95rem] text-gray-500 font-extrabold text-center border-b border-white/3">0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Leaderboard -->
+          <div>
+            <h3 class="text-[0.88rem] font-bold text-white mb-2">Leaderboard & Rankings</h3>
+            <ul class="flex flex-col gap-1.5 pl-4 m-0 text-[0.82rem] sm:text-[0.85rem] text-gray-300 leading-relaxed list-disc">
+              <li>A live leaderboard ranks all participants by total accumulated points.</li>
+              <li>Points are recalculated in real-time whenever an administrator enters a completed match result.</li>
+              <li>In case of a points tie, participants are ranked alphabetically by display name.</li>
+              <li>Rank change indicators (▲ / ▼) show position movement after each match completion.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Fair Play & Conduct -->
+      <section class="mb-8">
+        <h2 class="text-[1.05rem] sm:text-[1.15rem] font-extrabold text-white mb-4 flex items-center gap-2">
+          <span class="w-7 h-7 bg-amber-500/10 border border-amber-500/20 rounded-lg inline-flex items-center justify-center text-[0.85rem]">3</span>
+          Fair Play & Conduct
+        </h2>
+        <div class="flex flex-col gap-3 pl-2 sm:pl-4 border-l-2 border-white/5">
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            Participants must make their predictions <strong class="text-white">independently</strong>. Colluding, sharing accounts, or using automated tools to submit predictions is strictly prohibited and may result in immediate disqualification.
+          </p>
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            Any attempt to exploit bugs, vulnerabilities, or technical loopholes in the system for unfair advantage will lead to disqualification without warning.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 4: Privacy -->
+      <section class="mb-8">
+        <h2 class="text-[1.05rem] sm:text-[1.15rem] font-extrabold text-white mb-4 flex items-center gap-2">
+          <span class="w-7 h-7 bg-purple-500/10 border border-purple-500/20 rounded-lg inline-flex items-center justify-center text-[0.85rem]">4</span>
+          Privacy & Data
+        </h2>
+        <div class="flex flex-col gap-3 pl-2 sm:pl-4 border-l-2 border-white/5">
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            Your personal data (name, email, employee ID) is used solely for identification purposes within this contest. We do not share, sell, or distribute your data to any third parties.
+          </p>
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            Prediction data and leaderboard standings are visible to all registered participants.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 5: Final Decision -->
+      <section class="mb-6">
+        <h2 class="text-[1.05rem] sm:text-[1.15rem] font-extrabold text-white mb-4 flex items-center gap-2">
+          <span class="w-7 h-7 bg-red-500/10 border border-red-500/20 rounded-lg inline-flex items-center justify-center text-[0.85rem]">5</span>
+          Final Authority & Dispute Resolution
+        </h2>
+        <div class="flex flex-col gap-3 pl-2 sm:pl-4 border-l-2 border-red-500/15">
+          <div class="bg-amber-500/5 border border-amber-500/15 rounded-xl p-4">
+            <p class="text-[0.85rem] sm:text-[0.9rem] text-amber-300 leading-relaxed m-0 font-semibold">
+              ⚖️ All decisions taken by <strong class="text-amber-400">Reflections Sports Club</strong> regarding the contest, scoring, disqualification, prizes, and any disputes shall be <strong class="text-white">final and binding</strong>. No appeals or correspondence will be entertained.
+            </p>
+          </div>
+          <p class="text-[0.82rem] sm:text-[0.88rem] text-gray-300 leading-relaxed m-0">
+            The organizers reserve the right to interpret these rules and make judgment calls on any situation not explicitly covered by these terms.
+          </p>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="border-t border-white/5 pt-6 mt-6">
+        <!-- Contact -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-[0.88rem] font-bold text-white mb-1.5">📞 Point of Contact</h3>
+            <p class="text-[0.82rem] text-gray-400 m-0">
+              For questions, concerns, or disputes regarding this contest, please reach out to:
+            </p>
+            <p class="text-[0.9rem] text-[#00f2fe] font-bold m-0 mt-1.5">
+              Aryan C — <span class="text-gray-400 font-normal text-[0.82rem]">Reflections Sports Club</span>
+            </p>
+          </div>
+          <a routerLink="/dashboard" class="bg-white/3 border border-white/8 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl py-2.5 px-5 text-[0.82rem] font-bold no-underline transition-all duration-300 shrink-0">
+            ← Return to Dashboard
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Note -->
+    <div class="mt-6 text-[0.72rem] text-gray-600 tracking-[0.3px] text-center">
+      ⚽ By participating, you acknowledge that you have read and agree to these Terms & Conditions.
+    </div>
+
+  </div>
+</div>

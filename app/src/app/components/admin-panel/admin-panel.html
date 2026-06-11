@@ -1,0 +1,462 @@
+<div class="min-h-screen w-full bg-[#030305] bg-admin-glow relative overflow-x-hidden font-sans text-gray-100 pb-[60px] m-0 box-border">
+  <!-- Decorative SVG Concentric Rings Overlay -->
+  <div class="absolute top-0 right-0 w-[600px] h-[600px] pointer-events-none opacity-[0.03] z-0 overflow-hidden">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-white">
+      <circle cx="100" cy="100" r="80" fill="none" stroke="currentColor" stroke-width="0.5" />
+      <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3" />
+      <circle cx="100" cy="100" r="40" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="1 1" />
+      <path d="M20,100 L180,100" stroke="currentColor" stroke-width="0.25" />
+      <path d="M100,20 L100,180" stroke="currentColor" stroke-width="0.25" />
+    </svg>
+  </div>
+  <!-- Glowing Background Elements -->
+  <div class="absolute rounded-full blur-[80px] z-[1] opacity-20 w-[450px] h-[450px] bg-[radial-gradient(circle,#f59e0b_0%,transparent_70%)] top-[10%] right-[-5%]"></div>
+  <div class="absolute rounded-full blur-[80px] z-[1] opacity-20 w-[500px] h-[500px] bg-[radial-gradient(circle,#3b82f6_0%,transparent_70%)] bottom-[-10%] left-[-5%]"></div>
+
+  <div class="max-w-[1440px] mx-auto px-2.5 sm:px-5 relative z-10 pt-6 md:pt-8">
+
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-20 px-0 text-[#9ca3af] gap-[15px]">
+        <div class="w-[45px] h-[45px] border-[3.5px] border-white/5 border-t-amber-500 rounded-full animate-spin"></div>
+        <p>Loading administration panels...</p>
+      </div>
+    } @else {
+      <!-- Tab Controllers -->
+      <div class="flex flex-col sm:inline-flex bg-white/2 border border-white/5 rounded-[14px] p-1 mb-[35px] gap-1 w-full sm:w-auto">
+        <button (click)="activeTab.set('scoring')" [ngClass]="activeTab() === 'scoring' ? 'bg-blue-500 text-white shadow-[0_4px_12px_rgba(59,130,246,0.2)]' : 'bg-transparent text-[#9ca3af]'" class="w-full sm:w-auto border-none rounded-lg py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-[0.92rem] font-semibold cursor-pointer transition-all duration-300 hover:text-white text-center">
+          🎯 Fixture Scoring
+        </button>
+        <button (click)="activeTab.set('teams')" [ngClass]="activeTab() === 'teams' ? 'bg-blue-500 text-white shadow-[0_4px_12px_rgba(59,130,246,0.2)]' : 'bg-transparent text-[#9ca3af]'" class="w-full sm:w-auto border-none rounded-lg py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-[0.92rem] font-semibold cursor-pointer transition-all duration-300 hover:text-white text-center">
+          🚩 Manage Teams
+        </button>
+        <button (click)="activeTab.set('fixtures')" [ngClass]="activeTab() === 'fixtures' ? 'bg-blue-500 text-white shadow-[0_4px_12px_rgba(59,130,246,0.2)]' : 'bg-transparent text-[#9ca3af]'" class="w-full sm:w-auto border-none rounded-lg py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-[0.92rem] font-semibold cursor-pointer transition-all duration-300 hover:text-white text-center">
+          📅 Manage Fixtures
+        </button>
+      </div>
+
+      <!-- Action Status Banner -->
+      @if (statusMsg()) {
+        <div class="flex items-start sm:items-center gap-3 rounded-[14px] py-3 px-4 sm:py-3.5 sm:px-5 mb-[30px] text-xs sm:text-[0.92rem] text-left animate-shake" [ngClass]="statusMsg()?.success ? 'bg-emerald-500/8 border border-emerald-500/20 text-emerald-400' : 'bg-red-500/8 border border-red-500/20 text-red-400'">
+          <span>{{ statusMsg()?.success ? '✓' : '⚠️' }}</span>
+          <p class="m-0">{{ statusMsg()?.message }}</p>
+        </div>
+      }
+
+      <div class="tab-content animate-fade-in-up">
+        
+        <!-- TAB 1: SCORING -->
+        @if (activeTab() === 'scoring') {
+          <section class="fifa-card rounded-xl sm:rounded-2xl p-5 sm:p-[30px] text-left">
+            <h3 class="text-[1.25rem] font-extrabold m-0 mb-1.5 text-white">Enter Match Completion Score</h3>
+            <p class="text-[0.88rem] text-[#9ca3af] m-0 mb-6 leading-relaxed">Entering scores will mark the fixture as "completed" and recalculate all user points and the leaderboard instantly.</p>
+            
+            <form (submit)="submitScore()" class="flex flex-col gap-[18px]">
+              <div class="flex flex-col gap-2">
+                <label for="matchSelect" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Select Fixture</label>
+                <select id="matchSelect" name="matchSelect" [ngModel]="selectedMatchId()" (ngModelChange)="selectedMatchId.set($event)" class="w-full bg-[#0d142a] border-[1.5px] border-white/8 rounded-lg py-3 px-3.5 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3">
+                  @for (match of fixtures(); track match.id) {
+                    <option [value]="match.id" class="bg-[#0d142a] text-white text-xs sm:text-[0.92rem]">
+                      Match #{{ match.matchNumber }} - {{ match.homeTeam?.flag }} (Rank #{{ match.homeTeam?.fifaRanking || 'N/A' }}) {{ match.homeTeam?.name }} vs {{ match.awayTeam?.flag }} (Rank #{{ match.awayTeam?.fifaRanking || 'N/A' }}) {{ match.awayTeam?.name }} ({{ match.type === 'knockout' ? (match.group || 'Knockout Stage') : 'Group ' + match.group }} - {{ match.status | uppercase }})
+                    </option>
+                  }
+                </select>
+              </div>
+
+              @if (selectedMatch()) {
+                <div class="flex flex-col items-center justify-center gap-4 py-6 px-4 bg-white/[0.015] border border-white/3 rounded-2xl mb-2.5 w-full box-border">
+                  
+                  <!-- Match Header: Number & Group/Type & Time -->
+                  <div class="flex flex-col items-center gap-1.5 text-center">
+                    <span class="text-xs font-bold text-amber-500 uppercase tracking-wider bg-amber-500/10 px-3 py-1 rounded-full">
+                      Match #{{ selectedMatch()?.matchNumber }}
+                    </span>
+                    <span class="text-[0.8rem] text-gray-400">
+                      {{ selectedMatch()?.type === 'knockout' ? (selectedMatch()?.group || 'Knockout Stage') : 'Group ' + selectedMatch()?.group }} • IST: {{ selectedMatch()?.dateTime | date:'dd MMM yyyy, hh:mm a':'IST' }}
+                    </span>
+                  </div>
+
+                  <!-- Lock warning for future matches -->
+                  @if (!isMatchStarted()) {
+                    <div class="w-full flex items-center justify-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold py-2 px-3 rounded-lg text-center max-w-[500px]">
+                      <span>⚠️ Score entry is locked because this match has not started yet.</span>
+                    </div>
+                  }
+
+                  <!-- Team Flags, Names, and Score Inputs Grid -->
+                  <div class="flex flex-row items-center justify-between w-full max-w-[500px] gap-2 sm:gap-6 mt-2" [ngClass]="{'opacity-55 pointer-events-none': !isMatchStarted()}">
+                    
+                    <!-- Home Team -->
+                    <div class="flex-1 flex flex-col items-center gap-2 text-center">
+                      <span class="text-[2.5rem] filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] leading-none inline-flex items-center gap-2">
+                        <span>{{ selectedMatch()?.homeTeam?.flag }}</span>
+                        @if (selectedMatch()?.homeTeam?.fifaRanking) {
+                          <span class="text-[0.62rem] md:text-[0.75rem] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded select-none" title="FIFA Ranking">#{{ selectedMatch()?.homeTeam?.fifaRanking }}</span>
+                        }
+                      </span>
+                      <span class="text-[0.95rem] font-extrabold text-white line-clamp-1">{{ selectedMatch()?.homeTeam?.name }}</span>
+                      <input type="number" [(ngModel)]="scoreHome" name="scoreHome" [disabled]="!isMatchStarted() || actionLoading()" class="w-16 h-16 sm:w-[80px] sm:h-[80px] bg-white/3 border-2 border-white/10 rounded-xl sm:rounded-2xl text-xl sm:text-[2rem] font-extrabold text-white text-center outline-none transition-all duration-300 focus:border-amber-500 focus:bg-amber-500/4 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="0" min="0" required />
+                    </div>
+
+                    <!-- Separator -->
+                    <div class="flex flex-col items-center justify-center pb-2">
+                      <span class="text-xl sm:text-[2rem] text-gray-500 font-extrabold">:</span>
+                    </div>
+
+                    <!-- Away Team -->
+                    <div class="flex-1 flex flex-col items-center gap-2 text-center">
+                      <span class="text-[2.5rem] filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] leading-none inline-flex items-center gap-2">
+                        <span>{{ selectedMatch()?.awayTeam?.flag }}</span>
+                        @if (selectedMatch()?.awayTeam?.fifaRanking) {
+                          <span class="text-[0.62rem] md:text-[0.75rem] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded select-none" title="FIFA Ranking">#{{ selectedMatch()?.awayTeam?.fifaRanking }}</span>
+                        }
+                      </span>
+                      <span class="text-[0.95rem] font-extrabold text-white line-clamp-1">{{ selectedMatch()?.awayTeam?.name }}</span>
+                      <input type="number" [(ngModel)]="scoreAway" name="scoreAway" [disabled]="!isMatchStarted() || actionLoading()" class="w-16 h-16 sm:w-[80px] sm:h-[80px] bg-white/3 border-2 border-white/10 rounded-xl sm:rounded-2xl text-xl sm:text-[2rem] font-extrabold text-white text-center outline-none transition-all duration-300 focus:border-amber-500 focus:bg-amber-500/4 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="0" min="0" required />
+                    </div>
+
+                  </div>
+
+                  <!-- Knockout Actual Result details (only if match is knockout) -->
+                  @if (selectedMatch()?.type === 'knockout' && scoreHome() !== null && scoreAway() !== null) {
+                    <div class="w-full max-w-[500px] border-t border-white/5 pt-4 mt-2 flex flex-col gap-3" [ngClass]="{'opacity-55 pointer-events-none': !isMatchStarted()}">
+                      
+                      <!-- Winner Selection (only if scores are draw) -->
+                      @if (scoreHome() === scoreAway()) {
+                        <div class="flex flex-col gap-2">
+                          <label for="actualWinner" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">🏆 Penalty Shootout Winner</label>
+                          <select 
+                            id="actualWinner" 
+                            name="actualWinner" 
+                            [ngModel]="actualWinnerId()" 
+                            (ngModelChange)="actualWinnerId.set($event)" 
+                            [disabled]="!isMatchStarted() || actionLoading()"
+                            class="w-full bg-[#0d142a] border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none"
+                            required
+                          >
+                            <option value="" disabled class="bg-[#0d142a] text-gray-500">-- Select Winning Team --</option>
+                            <option [value]="selectedMatch()?.homeTeamId" class="bg-[#0d142a] text-white">
+                              {{ selectedMatch()?.homeTeam?.flag }} (Rank #{{ selectedMatch()?.homeTeam?.fifaRanking || 'N/A' }}) {{ selectedMatch()?.homeTeam?.name }}
+                            </option>
+                            <option [value]="selectedMatch()?.awayTeamId" class="bg-[#0d142a] text-white">
+                              {{ selectedMatch()?.awayTeam?.flag }} (Rank #{{ selectedMatch()?.awayTeam?.fifaRanking || 'N/A' }}) {{ selectedMatch()?.awayTeam?.name }}
+                            </option>
+                          </select>
+                        </div>
+                      }
+
+                      <!-- Resolution Time Selector -->
+                      <div class="flex flex-col gap-2">
+                        <label for="resTime" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">⏱ Match Finished In</label>
+                        @if (scoreHome() === scoreAway()) {
+                          <span class="bg-amber-500/10 border border-amber-500/25 text-amber-400 rounded-md py-2 px-3 font-semibold text-xs sm:text-[0.88rem] inline-block">
+                            Penalty Shootout (Forced due to Draw Scoreline)
+                          </span>
+                        } @else {
+                          <select 
+                            id="resTime" 
+                            name="resTime" 
+                            [ngModel]="resolutionTime()" 
+                            (ngModelChange)="resolutionTime.set($event)"
+                            [disabled]="!isMatchStarted() || actionLoading()"
+                            class="w-full bg-[#0d142a] border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none"
+                          >
+                            <option value="Normal Time" class="bg-[#0d142a] text-white">Normal Time</option>
+                            <option value="Extra Time" class="bg-[#0d142a] text-white">Extra Time</option>
+                          </select>
+                        }
+                      </div>
+
+                    </div>
+                  }
+
+                  <!-- Multi-Select Searchable Dropdown for Match Goal Scorers -->
+                  <div class="w-full max-w-[500px] border-t border-white/5 pt-4 mt-2 flex flex-col gap-3" [ngClass]="{'opacity-55 pointer-events-none': !isMatchStarted()}">
+                    <label class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Match Goal Scorers (Multi-Select)</label>
+                    
+                    <!-- Search Input -->
+                    <div class="relative w-full">
+                      <input 
+                        type="text" 
+                        placeholder="Search & select goal scorer..."
+                        [(ngModel)]="scorerSearchQuery"
+                        name="scorerSearch"
+                        (focus)="showScorerDropdown.set(true)"
+                        (blur)="onScorerSearchBlur()"
+                        [disabled]="!isMatchStarted() || actionLoading()"
+                        class="w-full bg-[#0d142a]/80 border-[1.5px] border-white/8 rounded-lg py-2 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3"
+                      />
+                      @if (showScorerDropdown() && getFilteredScorers().length > 0) {
+                        <div class="absolute z-[100] left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-[#0d142a]/95 border border-white/10 rounded-lg shadow-xl backdrop-blur-md min-w-[280px]">
+                          <div class="grid grid-cols-[1.2fr_1fr_0.5fr] gap-1 px-3 py-1.5 text-[0.62rem] font-extrabold text-gray-500 uppercase tracking-wider border-b border-white/5 bg-[#080d1d]">
+                            <span>Player Name</span>
+                            <span>Team</span>
+                            <span class="text-right">Pos</span>
+                          </div>
+                          @for (player of getFilteredScorers(); track player.id) {
+                            <div 
+                              (mousedown)="addScorer(player.id)"
+                              class="grid grid-cols-[1.2fr_1fr_0.5fr] gap-1 px-3 py-2 text-xs sm:text-[0.92rem] text-gray-200 hover:bg-blue-500/25 hover:text-white cursor-pointer transition-colors border-b border-white/3 last:border-b-0"
+                            >
+                              <span class="font-semibold truncate">{{ player.name }}</span>
+                              <span class="text-[0.68rem] text-gray-400 truncate">{{ getPlayerTeamName(player.teamId) }}</span>
+                              <span class="text-right text-[0.68rem] text-gray-500 font-mono font-bold">{{ player.position }}</span>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Selected Scorers Badges -->
+                    <div class="flex flex-wrap gap-2 mt-1">
+                      @for (scorerId of selectedActualScorers(); track scorerId) {
+                        <span class="inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-md py-1 px-2.5 text-xs font-semibold">
+                          {{ getPlayerName(scorerId) }}
+                          <button 
+                            type="button" 
+                            (click)="removeScorer(scorerId)"
+                            [disabled]="!isMatchStarted() || actionLoading()"
+                            class="bg-transparent border-none text-blue-400 hover:text-white cursor-pointer p-0 text-xs font-bold leading-none"
+                            title="Remove scorer"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      } @empty {
+                        <span class="text-xs text-gray-500 italic">No scorers selected (Goalless draw or no scorers entered yet)</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <button type="submit" class="w-full sm:w-auto flex-grow bg-amber-500 text-white border-none rounded-xl py-3 px-4 sm:py-3.5 sm:px-5 text-xs sm:text-[0.92rem] font-semibold cursor-pointer shadow-[0_6px_15px_rgba(245,158,11,0.15)] transition-all duration-200 hover:bg-amber-600 hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="!isMatchStarted() || actionLoading()">
+                @if (actionLoading()) { Processing... } @else { Save Score & Recalculate Leaderboard }
+              </button>
+            </form>
+          </section>
+        }
+
+        <!-- TAB 2: TEAMS MANAGER -->
+        @if (activeTab() === 'teams') {
+          <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-[30px] items-start">
+            <!-- Form Card -->
+            <section class="fifa-card rounded-xl sm:rounded-2xl p-5 sm:p-[30px] text-left">
+              <h3 class="text-[1.25rem] font-extrabold m-0 mb-1.5 text-white">{{ teamForm.isEdit ? '✏ Edit Team' : '➕ Add New Team' }}</h3>
+              <form (submit)="saveTeam()" class="flex flex-col gap-[18px]">
+                <div class="flex flex-col gap-2">
+                  <label for="teamId" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Team ID (3-Letter Code)</label>
+                  <input type="text" id="teamId" name="id" [(ngModel)]="teamForm.id" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="e.g. ARG" [disabled]="teamForm.isEdit || actionLoading()" required />
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="teamName" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Display Name</label>
+                  <input type="text" id="teamName" name="name" [(ngModel)]="teamForm.name" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="e.g. Argentina" [disabled]="actionLoading()" required />
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="teamFlag" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Emoji Flag</label>
+                  <input type="text" id="teamFlag" name="flag" [(ngModel)]="teamForm.flag" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="e.g. 🇦🇷" [disabled]="actionLoading()" required />
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="teamGroup" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Tournament Group</label>
+                  <input type="text" id="teamGroup" name="group" [(ngModel)]="teamForm.group" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="e.g. A" [disabled]="actionLoading()" required />
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="teamFifaRanking" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">FIFA Ranking</label>
+                  <input type="number" id="teamFifaRanking" name="fifaRanking" [(ngModel)]="teamForm.fifaRanking" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="e.g. 1" [disabled]="actionLoading()" min="1" />
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2.5 w-full">
+                  @if (teamForm.isEdit) {
+                    <button type="button" (click)="resetTeamForm()" class="w-full sm:w-auto bg-transparent border-[1.5px] border-white/10 text-gray-300 rounded-xl py-2.5 px-[18px] text-xs sm:text-[0.92rem] font-semibold cursor-pointer transition-all duration-200 hover:bg-white/5" [disabled]="actionLoading()">Cancel</button>
+                  }
+                  <button type="submit" class="w-full sm:w-auto flex-grow bg-blue-500 text-white border-none rounded-xl py-3 px-5 text-xs sm:text-[0.92rem] font-semibold cursor-pointer shadow-[0_6px_15px_rgba(59,130,246,0.15)] transition-all duration-200 hover:bg-blue-600 hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()">
+                    {{ teamForm.isEdit ? 'Update Team' : 'Create Team' }}
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Table Card -->
+            <section class="fifa-card rounded-xl sm:rounded-2xl p-[25px_0]! mt-[30px] lg:mt-0">
+              <h3 class="text-[1.2rem] font-extrabold m-0 mb-5 text-white pl-5">🚩 Teams Database</h3>
+              <div class="overflow-x-auto max-h-[580px]">
+                <table class="w-full border-collapse text-left">
+                  <thead>
+                    <tr>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5 w-12 sm:w-16">ID</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5">Flag</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5">Name</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5">Group</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (team of teams(); track team.id) {
+                      <tr class="hover:bg-white/[0.012]">
+                        <td class="p-3 sm:p-[14px_20px] text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold font-mono w-12 sm:w-16">{{ team.id }}</td>
+                        <td class="p-3 sm:p-[14px_20px] text-lg sm:text-2xl border-b border-white/3 text-gray-200">
+                          {{ team.flag }}
+                          @if (team.fifaRanking) {
+                            <span class="text-[0.62rem] sm:text-[0.75rem] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded select-none inline-block align-middle ml-1.5" title="FIFA Ranking">#{{ team.fifaRanking }}</span>
+                          }
+                        </td>
+                        <td class="p-3 sm:p-[14px_20px] text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-semibold">{{ team.name }}</td>
+                        <td class="p-3 sm:p-[14px_20px] text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200">Group {{ team.group }}</td>
+                        <td class="p-3 sm:p-[14px_20px] border-b border-white/3 text-gray-200 text-right">
+                          <div class="flex justify-end gap-2.5 sm:gap-3">
+                            <button (click)="editTeam(team)" class="bg-transparent border-none text-[0.75rem] sm:text-[0.82rem] font-bold text-amber-400 cursor-pointer transition-opacity duration-200 p-0 hover:opacity-80 hover:underline" [disabled]="actionLoading()">Edit</button>
+                            <button (click)="deleteTeam(team.id)" class="bg-transparent border-none text-[0.75rem] sm:text-[0.82rem] font-bold text-red-400 cursor-pointer transition-opacity duration-200 p-0 hover:opacity-80 hover:underline" [disabled]="actionLoading()">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="5" class="text-gray-500 p-[30px]! text-center text-xs sm:text-sm">No teams loaded.</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        }
+
+        <!-- TAB 3: FIXTURES MANAGER -->
+        @if (activeTab() === 'fixtures') {
+          <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-[30px] items-start">
+            <!-- Form Card -->
+            <section class="fifa-card rounded-xl sm:rounded-2xl p-5 sm:p-[30px] text-left">
+              <h3 class="text-[1.25rem] font-extrabold m-0 mb-1.5 text-white">{{ fixtureForm.isEdit ? '✏ Edit Fixture' : '➕ Add New Fixture' }}</h3>
+              <form (submit)="saveFixture()" class="flex flex-col gap-[18px]">
+                <div class="flex flex-col gap-2">
+                  <label for="fixId" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Match ID (Unique Code)</label>
+                  <input type="text" id="fixId" name="id" [(ngModel)]="fixtureForm.id" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="e.g. M01" [disabled]="fixtureForm.isEdit || actionLoading()" required />
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="fixNum" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Match Number</label>
+                  <input type="number" id="fixNum" name="matchNumber" [(ngModel)]="fixtureForm.matchNumber" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()" required />
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="fixType" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Match Type</label>
+                  <select id="fixType" name="type" [(ngModel)]="fixtureForm.type" class="w-full bg-[#0d142a] border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()" required>
+                    <option value="group" class="bg-[#0d142a] text-white text-xs sm:text-[0.92rem]">Group Stage</option>
+                    <option value="knockout" class="bg-[#0d142a] text-white text-xs sm:text-[0.92rem]">Knockout Stage</option>
+                  </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  @if (fixtureForm.type === 'knockout') {
+                    <label for="fixGroup" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Knockout Stage Name</label>
+                    <select id="fixGroup" name="group" [(ngModel)]="fixtureForm.group" class="w-full bg-[#0d142a] border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()" required>
+                      <option value="" disabled class="bg-[#0d142a] text-gray-500">-- Select Stage Name --</option>
+                      <option value="Round of 32" class="bg-[#0d142a] text-white">Round of 32</option>
+                      <option value="Round of 16" class="bg-[#0d142a] text-white">Round of 16</option>
+                      <option value="Quarter Final" class="bg-[#0d142a] text-white">Quarter Final</option>
+                      <option value="Semi Final" class="bg-[#0d142a] text-white">Semi Final</option>
+                      <option value="Losers Final" class="bg-[#0d142a] text-white">Losers Final</option>
+                      <option value="Final" class="bg-[#0d142a] text-white">Final</option>
+                    </select>
+                  } @else {
+                    <label for="fixGroup" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Group (Nullable)</label>
+                    <input type="text" id="fixGroup" name="group" [(ngModel)]="fixtureForm.group" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="e.g. A" [disabled]="actionLoading()" />
+                  }
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="fixHome" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Home Team</label>
+                  <select id="fixHome" name="homeTeamId" [(ngModel)]="fixtureForm.homeTeamId" class="w-full bg-[#0d142a] border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()" required>
+                    <option value="" disabled selected class="bg-[#0d142a] text-gray-500 text-xs sm:text-[0.92rem]">-- Select Team --</option>
+                    @for (team of teams(); track team.id) {
+                      <option [value]="team.id" class="bg-[#0d142a] text-white text-xs sm:text-[0.92rem]">{{ team.flag }} (Rank #{{ team.fifaRanking || 'N/A' }}) {{ team.name }} ({{ team.id }})</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="fixAway" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Away Team</label>
+                  <select id="fixAway" name="awayTeamId" [(ngModel)]="fixtureForm.awayTeamId" class="w-full bg-[#0d142a] border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()" required>
+                    <option value="" disabled selected class="bg-[#0d142a] text-gray-500 text-xs sm:text-[0.92rem]">-- Select Team --</option>
+                    @for (team of teams(); track team.id) {
+                      <option [value]="team.id" class="bg-[#0d142a] text-white text-xs sm:text-[0.92rem]">{{ team.flag }} (Rank #{{ team.fifaRanking || 'N/A' }}) {{ team.name }} ({{ team.id }})</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label for="fixDate" class="text-[0.82rem] font-semibold text-[#9ca3af] uppercase tracking-[0.5px]">Date/Time (IST Timezone)</label>
+                  <input type="datetime-local" id="fixDate" name="dateTime" [(ngModel)]="fixtureForm.dateTime" class="w-full bg-white/2 border-[1.5px] border-white/8 rounded-lg py-2.5 px-3 text-xs sm:text-[0.92rem] text-white outline-none box-border transition-all duration-300 focus:border-blue-500 focus:bg-blue-500/3 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()" required />
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2.5 w-full">
+                  @if (fixtureForm.isEdit) {
+                    <button type="button" (click)="resetFixtureForm()" class="w-full sm:w-auto bg-transparent border-[1.5px] border-white/10 text-gray-300 rounded-xl py-2.5 px-[18px] text-xs sm:text-[0.92rem] font-semibold cursor-pointer transition-all duration-200 hover:bg-white/5" [disabled]="actionLoading()">Cancel</button>
+                  }
+                  <button type="submit" class="w-full sm:w-auto flex-grow bg-blue-500 text-white border-none rounded-xl py-3 px-5 text-xs sm:text-[0.92rem] font-semibold cursor-pointer shadow-[0_6px_15px_rgba(59,130,246,0.15)] transition-all duration-200 hover:bg-blue-600 hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="actionLoading()">
+                    {{ fixtureForm.isEdit ? 'Update Fixture' : 'Create Fixture' }}
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Table Card -->
+            <section class="fifa-card rounded-xl sm:rounded-2xl p-[25px_0]! mt-[30px] lg:mt-0">
+              <h3 class="text-[1.2rem] font-extrabold m-0 mb-5 text-white pl-5">📅 Fixtures Database</h3>
+              <div class="overflow-x-auto max-h-[580px]">
+                <table class="w-full border-collapse text-left">
+                  <thead>
+                    <tr>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5">#</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5 hidden md:table-cell">ID</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5">Teams</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5">Date (IST)</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5">Status</th>
+                      <th class="p-3 sm:p-[14px_20px] font-semibold text-gray-500 uppercase text-[0.72rem] tracking-[0.8px] border-b border-white/5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (fix of fixtures(); track fix.id) {
+                      <tr class="hover:bg-white/[0.012]">
+                        <td class="p-3 sm:p-[14px_20px] text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold">#{{ fix.matchNumber }}</td>
+                        <td class="p-3 sm:p-[14px_20px] text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-mono hidden md:table-cell">{{ fix.id }}</td>
+                        <td class="p-3 sm:p-[14px_20px] text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-semibold">
+                          {{ fix.homeTeamId }} vs {{ fix.awayTeamId }}
+                        </td>
+                        <td class="p-3 sm:p-[14px_20px] border-b border-white/3 text-[0.75rem] sm:text-[0.8rem] text-[#9ca3af] whitespace-nowrap">
+                          {{ fix.dateTime | date:'dd MMM, hh:mm a':'IST' }}
+                        </td>
+                        <td class="p-3 sm:p-[14px_20px] border-b border-white/3 text-gray-200">
+                          <span class="text-[0.65rem] sm:text-[0.72rem] font-bold py-0.5 sm:py-0.75 px-1.5 sm:px-2 rounded uppercase" [ngClass]="{
+                            'bg-amber-500/8 border border-amber-500/20 text-amber-400': fix.status === 'pending',
+                            'bg-emerald-500/8 border border-emerald-500/20 text-emerald-400': fix.status === 'completed'
+                          }">
+                            {{ fix.status }}
+                          </span>
+                        </td>
+                        <td class="p-3 sm:p-[14px_20px] border-b border-white/3 text-gray-200 text-right">
+                          <div class="flex justify-end gap-2.5 sm:gap-3">
+                            <button (click)="editFixture(fix)" class="bg-transparent border-none text-[0.75rem] sm:text-[0.82rem] font-bold text-amber-400 cursor-pointer transition-opacity duration-200 p-0 hover:opacity-80 hover:underline" [disabled]="actionLoading()">Edit</button>
+                            <button (click)="deleteFixture(fix.id)" class="bg-transparent border-none text-[0.75rem] sm:text-[0.82rem] font-bold text-red-400 cursor-pointer transition-opacity duration-200 p-0 hover:opacity-80 hover:underline" [disabled]="actionLoading()">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="6" class="text-gray-500 p-[30px]! text-center text-xs sm:text-sm">No fixtures scheduled.</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        }
+
+      </div>
+    }
+  </div>
+</div>
