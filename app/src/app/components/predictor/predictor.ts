@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, PLATFORM_ID, signal, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { PredictorService, Team, Match, UserPrediction, Player } from '../../auth/predictor.service';
 import { AuthService } from '../../auth/auth.service';
 
@@ -15,7 +15,7 @@ interface EnrichedMatch extends Match {
 @Component({
   selector: 'app-predictor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './predictor.html',
   styleUrl: './predictor.css'
 })
@@ -113,9 +113,16 @@ export class PredictorComponent implements OnInit {
   localResolutionTimes: Record<string, string | null> = {};
 
   getMatchPlayers(fixture: EnrichedMatch): { id: string; name: string; teamId: string; position: string }[] {
+    const positionOrder: Record<string, number> = { 'FW': 1, 'MF': 2, 'DF': 3, 'GK': 4 };
     const list = this.players
       .filter(p => p.teamId === fixture.homeTeamId || p.teamId === fixture.awayTeamId)
-      .map(p => ({ id: p.id, name: p.name, teamId: p.teamId, position: p.position }));
+      .map(p => ({ id: p.id, name: p.name, teamId: p.teamId, position: p.position }))
+      .sort((a, b) => {
+        const orderA = positionOrder[a.position] || 99;
+        const orderB = positionOrder[b.position] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.name.localeCompare(b.name);
+      });
     
     return [
       { id: 'no-scorer', name: 'No Goal Scorers (Goalless Draw)', teamId: '', position: '' },
@@ -133,7 +140,7 @@ export class PredictorComponent implements OnInit {
   getPlayerTeamName(teamId: string): string {
     if (!teamId) return '';
     const t = this.teams.find(x => x.id === teamId);
-    return t ? `${t.flag} #${t.fifaRanking || 'N/A'} ${t.name}` : teamId;
+    return t ? `${t.flag} ${t.name}` : teamId;
   }
 
   selectScorer(fixture: EnrichedMatch, scorer: { id: string; name: string; teamId: string; position: string }): void {
@@ -339,7 +346,9 @@ export class PredictorComponent implements OnInit {
           }
 
           pointsEarned = scorePoints + resolutionPoints + scorerPoints;
-          pointsLabel = `${pointsEarned} pts (Score: +${scorePoints}, Scorer: +${scorerPoints}${match.type === 'knockout' ? `, Time: +${resolutionPoints}` : ''})`;
+          const resultPts = scorePoints > 0 ? 10 : 0;
+          const exactPts = scorePoints === 30 ? 20 : 0;
+          pointsLabel = `${pointsEarned} pts (Result: +${resultPts}, Score: +${exactPts}, Scorer: +${scorerPoints}${match.type === 'knockout' ? `, Time: +${resolutionPoints}` : ''})`;
         } else if (match.status === 'completed') {
           pointsLabel = 'No Prediction (+0 pts)';
         } else if (isLocked) {

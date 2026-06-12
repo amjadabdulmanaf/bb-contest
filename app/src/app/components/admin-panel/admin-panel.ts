@@ -76,9 +76,15 @@ export class AdminPanelComponent implements OnInit {
   selectedMatchPlayers = computed(() => {
     const match = this.selectedMatch();
     if (!match) return [];
-    return this.players().filter(
-      p => p.teamId === match.homeTeamId || p.teamId === match.awayTeamId
-    );
+    const positionOrder: Record<string, number> = { 'FW': 1, 'MF': 2, 'DF': 3, 'GK': 4 };
+    return this.players()
+      .filter(p => p.teamId === match.homeTeamId || p.teamId === match.awayTeamId)
+      .sort((a, b) => {
+        const orderA = positionOrder[a.position] || 99;
+        const orderB = positionOrder[b.position] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.name.localeCompare(b.name);
+      });
   });
 
   // 2. Team Form
@@ -207,7 +213,7 @@ export class AdminPanelComponent implements OnInit {
 
   getPlayerTeamName(teamId: string): string {
     const t = this.teams().find(x => x.id === teamId);
-    return t ? `${t.flag} #${t.fifaRanking || 'N/A'} ${t.name}` : teamId;
+    return t ? `${t.flag} ${t.name}` : teamId;
   }
 
   onScorerSearchBlur(): void {

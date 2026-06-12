@@ -359,22 +359,22 @@
                   [ngClass]="isCurrentUser(item) ? 'bg-gradient-to-r from-amber-500/12 to-transparent border-b-amber-500/15 border-l-[3px] border-l-amber-500 shadow-[inset_0_0_12px_rgba(245,158,11,0.08)]' : 'hover:bg-white/[0.015]'">
                   <td
                     class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold w-10 sm:w-14">
-                    @if (idx === 0) { 🥇 }
-                    @else if (idx === 1) { 🥈 }
-                    @else if (idx === 2) { 🥉 }
-                    @else { #{{ idx + 1 }} }
+                    @if (item.rank === 1) { 🥇 }
+                    @else if (item.rank === 2) { 🥈 }
+                    @else if (item.rank === 3) { 🥉 }
+                    @else { #{{ item.rank }} }
                   </td>
                   <td
                     class="p-1 sm:p-2 text-[0.65rem] sm:text-[0.72rem] border-b border-white/3 font-bold text-center w-8 sm:w-10">
                     @if (item.previousRank == null) {
                     <span class="text-gray-600">·</span>
-                    } @else if (item.previousRank > idx + 1) {
-                    <span class="text-emerald-400">▲{{ item.previousRank - (idx + 1) }}</span>
-                    } @else if (item.previousRank < idx + 1) { <span class="text-red-400">▼{{ (idx + 1) -
-                      item.previousRank }}</span>
-                      } @else {
-                      <span class="text-gray-600">·</span>
-                      }
+                    } @else if (item.previousRank > item.rank) {
+                    <span class="text-emerald-400">▲{{ item.previousRank - item.rank }}</span>
+                    } @else if (item.previousRank < item.rank) {
+                    <span class="text-red-400">▼{{ item.rank - item.previousRank }}</span>
+                    } @else {
+                    <span class="text-gray-600">·</span>
+                    }
                   </td>
                   <td
                     class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-semibold">
@@ -443,10 +443,10 @@
                 <tr class="hover:bg-white/[0.015]">
                   <td
                     class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold w-10 sm:w-14">
-                    @if (idx === 0) { 🥇 }
-                    @else if (idx === 1) { 🥈 }
-                    @else if (idx === 2) { 🥉 }
-                    @else { #{{ idx + 1 }} }
+                    @if (item.rank === 1) { 🥇 }
+                    @else if (item.rank === 2) { 🥈 }
+                    @else if (item.rank === 3) { 🥉 }
+                    @else { #{{ item.rank }} }
                   </td>
                   <td
                     class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-semibold">

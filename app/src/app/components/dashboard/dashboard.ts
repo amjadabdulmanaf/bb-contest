@@ -23,7 +23,7 @@ export class DashboardComponent implements OnInit {
   readonly isAdmin = this.authService.isAdmin;
 
   // Loaded data
-  readonly leaderboard = signal<LeaderboardUser[]>([]);
+  readonly leaderboard = signal<(LeaderboardUser & { rank: number })[]>([]);
   readonly colorLeaderboard = signal<ColorLeaderboardUser[]>([]);
   readonly activeLeaderboardTab = signal<'individual' | 'color'>('individual');
   readonly nextMatches = signal<Match[]>([]);
@@ -91,7 +91,21 @@ export class DashboardComponent implements OnInit {
 
       // 1. Load Leaderboard
       const leaderboardData = await this.predictorService.getLeaderboard();
-      this.leaderboard.set(leaderboardData);
+      const rankedLeaderboard = leaderboardData.map((user, idx) => {
+        let rank = idx + 1;
+        for (let i = idx - 1; i >= 0; i--) {
+          if (leaderboardData[i].points === user.points) {
+            rank = i + 1;
+          } else {
+            break;
+          }
+        }
+        return {
+          ...user,
+          rank
+        };
+      });
+      this.leaderboard.set(rankedLeaderboard);
 
       const colorLeaderboardData = await this.predictorService.getColorLeaderboard();
       this.colorLeaderboard.set(colorLeaderboardData);
@@ -420,9 +434,16 @@ export class DashboardComponent implements OnInit {
   }
 
   getMatchPlayers(fixture: Match): { id: string; name: string; teamId: string; position: string }[] {
+    const positionOrder: Record<string, number> = { 'FW': 1, 'MF': 2, 'DF': 3, 'GK': 4 };
     const list = this.players
       .filter(p => p.teamId === fixture.homeTeamId || p.teamId === fixture.awayTeamId)
-      .map(p => ({ id: p.id, name: p.name, teamId: p.teamId, position: p.position }));
+      .map(p => ({ id: p.id, name: p.name, teamId: p.teamId, position: p.position }))
+      .sort((a, b) => {
+        const orderA = positionOrder[a.position] || 99;
+        const orderB = positionOrder[b.position] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.name.localeCompare(b.name);
+      });
     
     return [
       { id: 'no-scorer', name: 'No Goal Scorers (Goalless Draw)', teamId: '', position: '' },
@@ -440,7 +461,7 @@ export class DashboardComponent implements OnInit {
   getPlayerTeamName(teamId: string): string {
     if (!teamId) return '';
     const t = this.teams.find(x => x.id === teamId);
-    return t ? `${t.flag} #${t.fifaRanking || 'N/A'} ${t.name}` : teamId;
+    return t ? `${t.flag} ${t.name}` : teamId;
   }
 
   selectScorer(fixture: Match, scorer: { id: string; name: string; teamId: string; position: string }, idx: number): void {
