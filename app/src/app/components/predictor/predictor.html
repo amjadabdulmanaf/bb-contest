@@ -342,12 +342,11 @@
                 >
                   <!-- Left: Scorer selector aligned close to label -->
                   <div class="flex flex-row items-center gap-2 sm:gap-4 flex-grow">
-                    <span class="text-[#9ca3af] font-medium shrink-0 flex items-center gap-0.5">
-                      <span>🎯</span>
-                      <span class="hidden sm:inline">Predicted </span>Scorer:
-                    </span>
-
                     @if (!fixture.isLocked) {
+                      <span class="text-[#9ca3af] font-medium shrink-0 flex items-center gap-0.5">
+                        <span>🎯</span>
+                        <span class="hidden sm:inline">Predicted </span>Scorer:
+                      </span>
                       <div
                         class="relative w-full max-w-[160px] sm:max-w-[240px]"
                         data-scorer-container="true"
@@ -415,9 +414,13 @@
                     } @else {
                       <!-- Locked / Completed Scorer details -->
                       <div
-                        class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-grow text-[#9ca3af]"
+                        class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-grow text-[#9ca3af] w-full"
                       >
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <span class="text-[#9ca3af] font-medium shrink-0 flex items-center gap-0.5">
+                            <span>🎯</span>
+                            <span class="hidden sm:inline">Predicted </span>Scorer:
+                          </span>
                           <span
                             class="font-semibold"
                             [ngClass]="{
@@ -480,10 +483,13 @@
                         </div>
                         @if (fixture.status === 'completed') {
                           <div
-                            class="flex items-center gap-1.5 border-t border-dashed border-white/5 pt-1.5 sm:border-t-0 sm:pt-0"
+                            class="flex items-start gap-1.5 border-t border-dashed border-white/5 pt-1.5 sm:border-t-0 sm:pt-0 sm:border-l sm:border-l-white/10 sm:pl-4"
                           >
-                            <span>⚽ Actual:</span>
-                            <span class="font-semibold text-gray-200">
+                            <span class="flex items-center gap-0.5 shrink-0">
+                              <span>⚽</span>
+                              <span>Actual:</span>
+                            </span>
+                            <span class="font-semibold text-gray-200 text-left">
                               @if (fixture.homeScore === 0 && fixture.awayScore === 0) {
                                 No Goal Scorers
                               } @else {

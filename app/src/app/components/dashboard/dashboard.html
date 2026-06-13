@@ -65,7 +65,8 @@
               <!-- Left: Match Info (Number & Group & Time) -->
               <div
                 class="flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center w-full md:w-auto pb-1.5 md:pb-0 border-b border-white/5 md:border-b-0 gap-1.5 md:min-w-[140px]">
-                <div class="flex flex-wrap items-center gap-1.5">
+                <!-- Match Info (Left on Mobile, Top on Desktop) -->
+                <div class="order-1 flex flex-wrap items-center gap-1.5 md:order-1">
                   <span
                     class="text-[0.68rem] md:text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full uppercase">Match
                     #{{ match.matchNumber }}</span>
@@ -76,16 +77,21 @@
                   </span>
                   }
                 </div>
+
+                <!-- Time (Middle and Highlighted on Mobile, Bottom on Desktop) -->
                 <div
-                  class="flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0.5 text-[0.7rem] md:text-[0.8rem] text-gray-400">
-                  <span class="font-semibold">
-                    @if (match.type === 'knockout') {
-                    {{ match.group || 'Knockout Stage' }}
-                    } @else {
-                    Group {{ match.group }}
-                    }
-                  </span>
-                  <span class="text-[0.68rem] md:text-[0.75rem] text-gray-500">🕒 {{ match.dateTime | date:'hh:mm a' }} {{ userTimezone() }}</span>
+                  class="order-2 flex items-center justify-center gap-1 text-[0.68rem] font-bold text-[#00f2fe] bg-[#00f2fe]/8 border border-[#00f2fe]/20 shadow-[0_0_8px_rgba(0,242,254,0.05)] px-2.5 py-0.5 rounded-full md:order-3 md:bg-transparent md:border-transparent md:p-0 md:rounded-none md:text-gray-500 md:text-[0.75rem] md:font-normal md:shadow-none">
+                  <span>🕒</span>
+                  <span>{{ match.dateTime | date:'hh:mm a' }} {{ userTimezone() }}</span>
+                </div>
+
+                <!-- Group Info (Right on Mobile, Middle on Desktop) -->
+                <div class="order-3 text-[0.7rem] font-semibold text-gray-400 md:order-2 md:text-[0.8rem]">
+                  @if (match.type === 'knockout') {
+                  {{ match.group || 'Knockout Stage' }}
+                  } @else {
+                  Group {{ match.group }}
+                  }
                 </div>
               </div>
 
@@ -349,7 +355,7 @@
                     class="p-2 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/5 bg-[#090b14]">
                     Name</th>
                   <th
-                    class="p-2 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/5 text-right w-16 sm:w-20 bg-[#090b14]">
+                    class="p-2 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/5 text-right w-20 sm:w-24 bg-[#090b14] whitespace-nowrap">
                     Points</th>
                 </tr>
               </thead>
@@ -396,7 +402,7 @@
                     </div>
                   </td>
                   <td
-                    class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold text-right w-16 sm:w-20">
+                    class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold text-right w-20 sm:w-24 whitespace-nowrap">
                     {{ item.points }} pts</td>
                 </tr>
                 } @empty {
@@ -434,7 +440,7 @@
                     class="p-2 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/5 text-center bg-[#090b14] w-20">
                     Players</th>
                   <th
-                    class="p-2 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/5 text-right w-16 sm:w-20 bg-[#090b14]">
+                    class="p-2 sm:p-3 font-semibold text-gray-500 uppercase text-[0.7rem] tracking-[0.5px] border-b border-white/5 text-right w-20 sm:w-24 bg-[#090b14] whitespace-nowrap">
                     Points</th>
                 </tr>
               </thead>
@@ -468,7 +474,7 @@
                     {{ item.employeeCount }}
                   </td>
                   <td
-                    class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold text-right w-16 sm:w-20">
+                    class="p-2.5 sm:p-3 text-xs sm:text-[0.88rem] border-b border-white/3 text-gray-200 font-bold text-right w-20 sm:w-24 whitespace-nowrap">
                     {{ item.totalPoints }} pts</td>
                 </tr>
                 } @empty {
