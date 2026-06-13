@@ -123,7 +123,7 @@ export class PredictorComponent implements OnInit {
         if (orderA !== orderB) return orderA - orderB;
         return a.name.localeCompare(b.name);
       });
-    
+
     return [
       { id: 'no-scorer', name: 'No Goal Scorers (Goalless Draw)', teamId: '', position: '' },
       ...list
@@ -198,6 +198,7 @@ export class PredictorComponent implements OnInit {
   readonly saveStatus = signal<{ success: boolean; message: string } | null>(null);
   validatedIncompleteFixtureIds = new Set<string>();
   readonly userTimezone = signal<string>('UTC');
+  readonly downloadingPdfMatchId = signal<string | null>(null);
 
   private getUserTimezone(): string {
     try {
@@ -470,9 +471,9 @@ export class PredictorComponent implements OnInit {
       this.dirtyMatchIds.add(fixture.id);
     }
 
-    this.saveStatus.set({ 
-      success: true, 
-      message: `Auto-filled ${unpredictedFixtures.length} unpredicted fixtures! Please save your predictions below.` 
+    this.saveStatus.set({
+      success: true,
+      message: `Auto-filled ${unpredictedFixtures.length} unpredicted fixtures! Please save your predictions below.`
     });
     setTimeout(() => this.saveStatus.set(null), 5000);
   }
@@ -512,9 +513,9 @@ export class PredictorComponent implements OnInit {
     if (hasIncomplete) {
       const firstIncompleteId = Array.from(this.dirtyMatchIds).find(id => this.isPredictionIncomplete(id));
       const firstFixture = this.fixtures.find(f => f.id === firstIncompleteId);
-      this.saveStatus.set({ 
-        success: false, 
-        message: `Please complete all predictions (scores & scorer) for Match #${firstFixture?.matchNumber} before saving.` 
+      this.saveStatus.set({
+        success: false,
+        message: `Please complete all predictions (scores & scorer) for Match #${firstFixture?.matchNumber} before saving.`
       });
       this.saving.set(false);
       return;
@@ -551,7 +552,7 @@ export class PredictorComponent implements OnInit {
       }
       this.dirtyMatchIds.clear();
       this.saveStatus.set({ success: true, message: 'All predictions saved successfully!' });
-      
+
       // Reload details to sync prediction status
       await this.loadPredictorData();
 
@@ -571,19 +572,141 @@ export class PredictorComponent implements OnInit {
     return {
       // Completed state (Emerald)
       'border-l-[6px] border-l-emerald-500 border-emerald-500/25! bg-emerald-500/[0.015]! hover:bg-emerald-500/[0.03]!': fixture.status === 'completed',
-      
+
       // Locked state (Pending but past kickoff - Amber)
       'border-l-[6px] border-l-amber-500 border-amber-500/25! bg-amber-500/[0.015]! hover:bg-amber-500/[0.03]! opacity-90': fixture.isLocked && fixture.status !== 'completed',
-      
+
       // Incomplete state warning highlight
       'border-rose-500! border-l-[6px] border-l-rose-500! bg-rose-500/[0.02]! shadow-[0_0_15px_rgba(244,63,94,0.2)]! animate-shake': isIncomplete,
 
       // Predicted but didn't start (Future & Predicted - Blue)
       'border-l-[6px] border-l-blue-500 border-blue-500/25! bg-blue-500/[0.012]! hover:bg-blue-500/[0.028]!': !fixture.isLocked && hasPrediction && !isIncomplete,
-      
+
       // Not predicted but didn't start (Future & Unpredicted - Rose)
       'border-l-[6px] border-l-rose-500 border-rose-500/25! bg-rose-500/[0.012]! hover:bg-rose-500/[0.028]!': !fixture.isLocked && !hasPrediction && !isIncomplete
     };
+  }
+
+  async downloadPredictionsPDF(fixture: EnrichedMatch): Promise<void> {
+    if (this.downloadingPdfMatchId()) return;
+
+    this.downloadingPdfMatchId.set(fixture.id);
+
+    try {
+      const predictions = await this.predictorService.getMatchPredictions(fixture.id);
+
+      const { jsPDF } = await import('jspdf');
+      const autoTable = (await import('jspdf-autotable')).default;
+
+      const doc = new jsPDF();
+
+      // 1. Top Dark Banner (Website Theme Card Color)
+      doc.setFillColor(9, 11, 20); // #090b14 Dark Navy
+      doc.rect(0, 0, 210, 38, 'F');
+
+      // 2. Bottom Accent Line of the Banner (Website Theme Accent Cyan)
+      doc.setFillColor(0, 242, 254); // #00f2fe Cyan
+      doc.rect(0, 37, 210, 1, 'F');
+
+      // 3. Title inside Banner
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.setTextColor(255, 255, 255);
+      doc.text(`WORLD CUP PREDICTOR`, 14, 18);
+
+      // 4. Subtitle inside Banner
+      doc.setFontSize(11);
+      doc.setTextColor(0, 242, 254); // Cyan color accent
+      doc.setFont('helvetica', 'normal');
+      doc.text(`MATCH #${fixture.matchNumber} PREDICTIONS`, 14, 28);
+
+      // 5. Downloaded Time (Top Right inside Banner)
+      doc.setFontSize(8.5);
+      doc.setTextColor(156, 163, 175); // gray-400
+      const downloadTimeStr = `Downloaded: ${new Date().toLocaleString()} (${this.userTimezone()})`;
+      doc.text(downloadTimeStr, 196, 15, { align: 'right' });
+
+      // 6. Match Details Section
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(55, 65, 81); // gray-700
+
+      // Team Names (Remove Emojis to prevent garbage character generation in standard PDF fonts!)
+      const homeName = fixture.homeTeam?.name || 'Home Team';
+      const awayName = fixture.awayTeam?.name || 'Away Team';
+
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Match:`, 14, 48);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${homeName} vs ${awayName}`, 35, 48);
+
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Kick-off:`, 14, 54);
+      doc.setFont('helvetica', 'normal');
+      const matchDate = fixture.dateTime ? new Date(fixture.dateTime).toLocaleString() : 'N/A';
+      doc.text(`${matchDate} (${this.userTimezone()})`, 35, 54);
+
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Submitted:`, 14, 60);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${predictions.length} predictions`, 35, 60);
+
+      // Table configuration
+      const headers = ['Participant Name', 'Predicted Score', 'Predicted Scorer'];
+      if (fixture.type === 'knockout') {
+        headers.push('Shootout Winner');
+        headers.push('Finishes In');
+      }
+
+      const body = predictions.map(pred => {
+        const row = [
+          pred.user?.displayName || 'Unknown',
+          pred.homeScore !== null && pred.awayScore !== null ? `${pred.homeScore} - ${pred.awayScore}` : 'N/A',
+          this.getPlayerName(pred.predictedScorerId)
+        ];
+
+        if (fixture.type === 'knockout') {
+          const winnerName = pred.predictedWinnerId ? (pred.predictedWinnerId === fixture.homeTeamId ? fixture.homeTeam?.name : fixture.awayTeam?.name) : 'N/A';
+          row.push(winnerName || 'N/A');
+          row.push(pred.predictedResolutionTime || 'N/A');
+        }
+
+        return row;
+      });
+
+      // Render AutoTable starting at Y=66
+      autoTable(doc, {
+        startY: 66,
+        head: [headers],
+        body: body,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [9, 11, 20],
+          textColor: [255, 255, 255],
+          fontSize: 9.5,
+          fontStyle: 'bold',
+          halign: 'left',
+          cellPadding: 3.5
+        },
+        bodyStyles: {
+          fontSize: 8.5,
+          textColor: [31, 41, 55], // gray-800
+          cellPadding: 3
+        },
+        alternateRowStyles: {
+          fillColor: [249, 250, 251] // subtle gray
+        },
+        margin: { left: 14, right: 14 }
+      });
+
+      // Save PDF
+      doc.save(`Match_${fixture.matchNumber}_Predictions.pdf`);
+    } catch (err) {
+      console.error('Failed to download predictions PDF:', err);
+      alert('Could not download predictions PDF. Please try again.');
+    } finally {
+      this.downloadingPdfMatchId.set(null);
+    }
   }
 
   @HostListener('document:mousedown', ['$event'])

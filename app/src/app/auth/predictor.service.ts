@@ -100,6 +100,10 @@ export class PredictorService {
     return firstValueFrom(this.http.get<ColorLeaderboardUser[]>(`${this.apiBase}/predictions/color-leaderboard`));
   }
 
+  async getMatchPredictions(matchId: string): Promise<any[]> {
+    return firstValueFrom(this.http.get<any[]>(`${this.apiBase}/predictions/match/${matchId}`));
+  }
+
   // ----------------------------------------
   // Admin Operations (conveniently placed here or separate)
   // ----------------------------------------
