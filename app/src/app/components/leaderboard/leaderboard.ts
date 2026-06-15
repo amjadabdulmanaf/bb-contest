@@ -90,12 +90,14 @@ export class LeaderboardComponent implements OnInit {
       const rankedLeaderboard = leaderboardData.map((user, idx) => {
         let rank = idx + 1;
         for (let i = idx - 1; i >= 0; i--) {
+          const prev = leaderboardData[i] as any;
+          const curr = user as any;
           if (
-            leaderboardData[i].points === user.points &&
-            leaderboardData[i].exactMatches === user.exactMatches &&
-            leaderboardData[i].goalScorers === user.goalScorers &&
-            leaderboardData[i].results === user.results &&
-            leaderboardData[i].times === user.times
+            prev.points === curr.points &&
+            prev.exactMatches === curr.exactMatches &&
+            prev.goalScorers === curr.goalScorers &&
+            prev.results === curr.results &&
+            prev.times === curr.times
           ) {
             rank = i + 1;
           } else {
