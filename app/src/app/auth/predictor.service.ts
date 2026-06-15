@@ -53,6 +53,10 @@ export interface LeaderboardUser {
   empId: string;
   colorTeam: string;
   points: number;
+  exactMatches: number;
+  goalScorers: number;
+  results: number;
+  times: number;
   previousRank?: number | null;
   role: string;
 }

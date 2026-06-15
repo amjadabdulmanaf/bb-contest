@@ -5,12 +5,14 @@ import { PredictorComponent } from './components/predictor/predictor';
 import { SetPasswordComponent } from './components/set-password/set-password';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel';
 import { TermsComponent } from './components/terms/terms';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard';
 import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'predictor', component: PredictorComponent, canActivate: [authGuard] },
+  { path: 'leaderboard', component: LeaderboardComponent, canActivate: [authGuard] },
   { path: 'admin', component: AdminPanelComponent, canActivate: [authGuard] },
   { path: 'terms', component: TermsComponent, canActivate: [authGuard] },
   { path: 'set-password', component: SetPasswordComponent },
