@@ -170,18 +170,49 @@ export class LeaderboardComponent implements OnInit {
     return end > total ? total : end;
   }
 
-  getPageRange(): number[] {
+  getVisiblePages(): (number | string)[] {
+    const current = this.currentPage();
     const total = this.totalPages();
-    const range: number[] = [];
-    for (let i = 1; i <= total; i++) {
-      range.push(i);
+    const range: (number | string)[] = [];
+
+    if (total <= 5) {
+      for (let i = 1; i <= total; i++) {
+        range.push(i);
+      }
+      return range;
     }
+
+    // Always include page 1
+    range.push(1);
+
+    if (current > 3) {
+      range.push('...');
+    }
+
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+
+    for (let i = start; i <= end; i++) {
+      if (!range.includes(i)) {
+        range.push(i);
+      }
+    }
+
+    if (current < total - 2) {
+      range.push('...');
+    }
+
+    if (!range.includes(total)) {
+      range.push(total);
+    }
+
     return range;
   }
 
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
+  goToPage(page: number | string): void {
+    const targetPage = typeof page === 'number' ? page : parseInt(page, 10);
+    if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= this.totalPages()) {
+      this.currentPage.set(targetPage);
     }
   }
 }
