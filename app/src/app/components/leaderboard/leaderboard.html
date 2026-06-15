@@ -147,7 +147,7 @@
                       </span>
                       @if (hasKnockoutStarted()) {
                         <span class="bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/15 px-1.5 py-0.5 rounded text-[0.62rem] font-bold flex items-center gap-0.5">
-                          ⏱ {{ item.times }}
+                          ⏱ {{ $any(item).times }}
                         </span>
                       }
                     </div>
@@ -187,7 +187,7 @@
                   <!-- Time column -->
                   @if (hasKnockoutStarted()) {
                     <td class="p-3 md:p-4 text-center font-bold text-fuchsia-400 text-sm border-l border-white/5 hidden md:table-cell">
-                      {{ item.times }}
+                      {{ $any(item).times }}
                       <span class="block text-[0.62rem] text-gray-500 font-normal uppercase tracking-wider mt-0.5">Correct Time (10 pts)</span>
                     </td>
                   }
