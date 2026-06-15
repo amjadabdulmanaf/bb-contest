@@ -105,6 +105,18 @@
             Correctly predicting the match finish time (Normal Time / Extra Time / Penalty
             Shootout) for knockout fixtures.
           </li>
+          <li>
+            ⚖️
+            <strong class="text-stone-950 font-extrabold">Leaderboard Tie-Breaking:</strong>
+            If multiple players have the same points, the following priority order is used to resolve the tie:
+            <ol class="list-decimal pl-5 mt-1 flex flex-col gap-1 text-[0.82rem] text-stone-800">
+              <li>Higher <strong class="text-stone-950">Exact Score Correct</strong> count</li>
+              <li>Higher <strong class="text-stone-950">Goal Scorer Correct</strong> count</li>
+              <li>Higher <strong class="text-stone-950">Result Correct</strong> count</li>
+              <li>Higher <strong class="text-stone-950">Time Correct</strong> count (knockout only)</li>
+            </ol>
+            If all stats are identical, players share the rank and are displayed alphabetically.
+          </li>
           <li>🔒 Predictions strictly lock at the match kick-off time ({{ userTimezone() }}).</li>
         </ul>
       </div>

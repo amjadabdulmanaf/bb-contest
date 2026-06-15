@@ -30,6 +30,7 @@ export class DashboardComponent implements OnInit {
   readonly nextPredictions = signal<UserPrediction[]>([]);
   readonly activeCarouselIndex = signal<number>(0);
   readonly slideDirection = signal<'left' | 'right'>('left');
+  readonly showRankingPopup = signal<boolean>(false);
 
   // Scorer prediction state
   searchQueries: Record<string, string> = {};
@@ -79,6 +80,13 @@ export class DashboardComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     if (this.isBrowser) {
       this.userTimezone.set(this.getUserTimezone());
+
+      // Show popup explaining the new ranking rules if not already dismissed
+      const dismissed = localStorage.getItem('ranking_rules_popup_dismissed_v3');
+      if (!dismissed) {
+        this.showRankingPopup.set(true);
+      }
+
       await this.loadDashboardData();
     }
   }
@@ -94,7 +102,13 @@ export class DashboardComponent implements OnInit {
       const rankedLeaderboard = leaderboardData.map((user, idx) => {
         let rank = idx + 1;
         for (let i = idx - 1; i >= 0; i--) {
-          if (leaderboardData[i].points === user.points) {
+          if (
+            leaderboardData[i].points === user.points &&
+            leaderboardData[i].exactMatches === user.exactMatches &&
+            leaderboardData[i].goalScorers === user.goalScorers &&
+            leaderboardData[i].results === user.results &&
+            leaderboardData[i].times === user.times
+          ) {
             rank = i + 1;
           } else {
             break;
@@ -431,6 +445,13 @@ export class DashboardComponent implements OnInit {
 
   isCurrentUser(item: LeaderboardUser): boolean {
     return item.email === this.user()?.email;
+  }
+
+  dismissRankingPopup(): void {
+    if (this.isBrowser) {
+      localStorage.setItem('ranking_rules_popup_dismissed_v3', 'true');
+    }
+    this.showRankingPopup.set(false);
   }
 
   getMatchPlayers(fixture: Match): { id: string; name: string; teamId: string; position: string }[] {

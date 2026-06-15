@@ -43,8 +43,14 @@
       <a routerLink="/dashboard" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" [routerLinkActiveOptions]="{exact: true}" class="no-underline text-[0.88rem] font-bold py-1.5 px-4 rounded-lg transition-all duration-200 text-gray-400 border border-transparent hover:text-white flex items-center gap-1.5">
         📊 <span>Dashboard</span>
       </a>
-      <a routerLink="/predictor" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" class="no-underline text-[0.88rem] font-bold py-1.5 px-4 rounded-lg transition-all duration-200 text-gray-400 border border-transparent hover:text-white flex items-center gap-1.5">
+      <a routerLink="/leaderboard" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" class="no-underline text-[0.88rem] font-bold py-1.5 px-4 rounded-lg transition-all duration-200 text-gray-400 border border-transparent hover:text-white flex items-center gap-1.5">
+        🏆 <span>Leaderboard</span>
+      </a>
+      <a routerLink="/predictor" [queryParams]="{tab: 'fixtures'}" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" class="no-underline text-[0.88rem] font-bold py-1.5 px-4 rounded-lg transition-all duration-200 text-gray-400 border border-transparent hover:text-white flex items-center gap-1.5">
         📅 <span>Fixtures</span>
+      </a>
+      <a routerLink="/predictor" [queryParams]="{tab: 'results'}" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" class="no-underline text-[0.88rem] font-bold py-1.5 px-4 rounded-lg transition-all duration-200 text-gray-400 border border-transparent hover:text-white flex items-center gap-1.5">
+        📝 <span>Results</span>
       </a>
       <a routerLink="/terms" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" class="no-underline text-[0.88rem] font-bold py-1.5 px-4 rounded-lg transition-all duration-200 text-gray-400 border border-transparent hover:text-white flex items-center gap-1.5">
         📜 <span>Terms</span>
@@ -83,8 +89,14 @@
           <a routerLink="/dashboard" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()" class="no-underline text-xs font-bold py-2 px-3.5 rounded-lg text-gray-400 border border-transparent hover:text-white flex items-center gap-2">
             📊 <span>Dashboard</span>
           </a>
-          <a routerLink="/predictor" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" (click)="closeMenu()" class="no-underline text-xs font-bold py-2 px-3.5 rounded-lg text-gray-400 border border-transparent hover:text-white flex items-center gap-2">
+          <a routerLink="/leaderboard" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" (click)="closeMenu()" class="no-underline text-xs font-bold py-2 px-3.5 rounded-lg text-gray-400 border border-transparent hover:text-white flex items-center gap-2">
+            🏆 <span>Leaderboard</span>
+          </a>
+          <a routerLink="/predictor" [queryParams]="{tab: 'fixtures'}" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" (click)="closeMenu()" class="no-underline text-xs font-bold py-2 px-3.5 rounded-lg text-gray-400 border border-transparent hover:text-white flex items-center gap-2">
             📅 <span>Fixtures</span>
+          </a>
+          <a routerLink="/predictor" [queryParams]="{tab: 'results'}" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" (click)="closeMenu()" class="no-underline text-xs font-bold py-2 px-3.5 rounded-lg text-gray-400 border border-transparent hover:text-white flex items-center gap-2">
+            📝 <span>Results</span>
           </a>
           <a routerLink="/terms" routerLinkActive="bg-white/6 text-amber-400 border border-white/10" (click)="closeMenu()" class="no-underline text-xs font-bold py-2 px-3.5 rounded-lg text-gray-400 border border-transparent hover:text-white flex items-center gap-2">
             📜 <span>Terms</span>

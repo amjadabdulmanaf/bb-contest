@@ -126,7 +126,15 @@
             <ul class="flex flex-col gap-1.5 pl-4 m-0 text-[0.82rem] sm:text-[0.85rem] text-gray-300 leading-relaxed list-disc">
               <li>A live leaderboard ranks all participants by total accumulated points.</li>
               <li>Points are recalculated in real-time whenever an administrator enters a completed match result.</li>
-              <li>In case of a points tie, participants are ranked alphabetically by display name.</li>
+              <li>In case of a points tie, the following priority order is used to resolve the tie:
+                <ul class="list-decimal pl-5 mt-1.5 flex flex-col gap-1 text-[0.82rem] text-gray-400">
+                  <li>Higher <strong class="text-amber-400">Exact Score Correct</strong> count (Priority 1)</li>
+                  <li>Higher <strong class="text-blue-400">Goal Scorer Correct</strong> count (Priority 2)</li>
+                  <li>Higher <strong class="text-emerald-400">Result Correct</strong> count (Priority 3)</li>
+                  <li>Higher <strong class="text-fuchsia-400">Time Correct</strong> count (Priority 4, Knockouts only)</li>
+                </ul>
+                If all statistics are equal, players share the rank and are displayed alphabetically.
+              </li>
               <li>Rank change indicators (▲ / ▼) show position movement after each match completion.</li>
             </ul>
           </div>

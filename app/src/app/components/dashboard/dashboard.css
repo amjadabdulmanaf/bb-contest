@@ -6,6 +6,12 @@
   }
 }
 
+@media (max-width: 1023px) {
+  .hidden-mobile-tab {
+    display: none !important;
+  }
+}
+
 @keyframes slide-in-left {
   from {
     transform: translateX(30px);

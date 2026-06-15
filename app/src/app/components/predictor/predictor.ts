@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, PLATFORM_ID, signal, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PredictorService, Team, Match, UserPrediction, Player } from '../../auth/predictor.service';
 import { AuthService } from '../../auth/auth.service';
 
@@ -23,6 +23,7 @@ export class PredictorComponent implements OnInit {
   private readonly predictorService = inject(PredictorService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly platformId = inject(PLATFORM_ID);
   readonly isBrowser = isPlatformBrowser(this.platformId);
 
@@ -237,6 +238,14 @@ export class PredictorComponent implements OnInit {
     if (this.isBrowser) {
       this.userTimezone.set(this.getUserTimezone());
       this.loadPredictorData();
+
+      // Check query param for active tab
+      this.route.queryParams.subscribe(params => {
+        const tab = params['tab'];
+        if (tab === 'fixtures' || tab === 'results' || tab === 'rules') {
+          this.activeTab = tab;
+        }
+      });
     }
   }
 
