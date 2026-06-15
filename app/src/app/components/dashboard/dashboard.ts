@@ -82,7 +82,7 @@ export class DashboardComponent implements OnInit {
       this.userTimezone.set(this.getUserTimezone());
 
       // Show popup explaining the new ranking rules if not already dismissed
-      const dismissed = localStorage.getItem('ranking_rules_popup_dismissed_v3');
+      const dismissed = localStorage.getItem('ranking_rules_popup_dismissed_v4');
       if (!dismissed) {
         this.showRankingPopup.set(true);
       }
@@ -449,7 +449,7 @@ export class DashboardComponent implements OnInit {
 
   dismissRankingPopup(): void {
     if (this.isBrowser) {
-      localStorage.setItem('ranking_rules_popup_dismissed_v3', 'true');
+      localStorage.setItem('ranking_rules_popup_dismissed_v4', 'true');
     }
     this.showRankingPopup.set(false);
   }

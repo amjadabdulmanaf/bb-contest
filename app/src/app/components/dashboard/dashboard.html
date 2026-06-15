@@ -513,9 +513,9 @@
 
     <!-- Glowing Modal Backdrop -->
     @if (showRankingPopup()) {
-      <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="fixed inset-0 z-[9999] flex items-start sm:items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
         <!-- Modal Container -->
-        <div class="w-full max-w-4xl bg-[#090b14] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative flex flex-col gap-6 text-left">
+        <div class="w-full max-w-4xl bg-[#090b14] border border-white/10 rounded-2xl p-5 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative flex flex-col gap-5 sm:gap-6 text-left my-20 sm:my-auto">
           
           <!-- Close Button (X) -->
           <button (click)="dismissRankingPopup()" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-transparent border-none cursor-pointer p-1 transition-colors focus:outline-none">
@@ -542,9 +542,9 @@
           </p>
           
           <!-- Priorities Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
             <!-- Card 1 -->
-            <div class="bg-white/2 border border-white/5 p-4 rounded-xl flex flex-col gap-2 hover:border-amber-500/20 transition-all duration-300">
+            <div class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-amber-500/20 transition-all duration-300">
               <div class="flex items-center gap-2">
                 <span class="w-6 h-6 flex items-center justify-center bg-amber-400/10 text-amber-400 font-extrabold text-xs rounded-full">1</span>
                 <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Exact Score</strong>
@@ -554,7 +554,7 @@
               </p>
             </div>
             <!-- Card 2 -->
-            <div class="bg-white/2 border border-white/5 p-4 rounded-xl flex flex-col gap-2 hover:border-blue-500/20 transition-all duration-300">
+            <div class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-blue-500/20 transition-all duration-300">
               <div class="flex items-center gap-2">
                 <span class="w-6 h-6 flex items-center justify-center bg-blue-400/10 text-blue-400 font-extrabold text-xs rounded-full">2</span>
                 <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Goal Scorer</strong>
@@ -564,7 +564,7 @@
               </p>
             </div>
             <!-- Card 3 -->
-            <div class="bg-white/2 border border-white/5 p-4 rounded-xl flex flex-col gap-2 hover:border-emerald-500/20 transition-all duration-300">
+            <div class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-emerald-500/20 transition-all duration-300">
               <div class="flex items-center gap-2">
                 <span class="w-6 h-6 flex items-center justify-center bg-emerald-400/10 text-emerald-400 font-extrabold text-xs rounded-full">3</span>
                 <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Result Outcome</strong>
@@ -574,7 +574,7 @@
               </p>
             </div>
             <!-- Card 4 -->
-            <div class="bg-white/2 border border-white/5 p-4 rounded-xl flex flex-col gap-2 hover:border-fuchsia-500/20 transition-all duration-300">
+            <div class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-fuchsia-500/20 transition-all duration-300">
               <div class="flex items-center gap-2">
                 <span class="w-6 h-6 flex items-center justify-center bg-fuchsia-400/10 text-fuchsia-400 font-extrabold text-xs rounded-full">4</span>
                 <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Match Time</strong>
