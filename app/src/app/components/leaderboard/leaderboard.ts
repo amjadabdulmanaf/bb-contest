@@ -17,11 +17,20 @@ export class LeaderboardComponent implements OnInit {
   private readonly predictorService = inject(PredictorService);
 
   readonly user = this.authService.currentUser;
+
+  getTeamLogo(colorTeam: string | null | undefined): string | null {
+    return this.authService.getTeamLogo(colorTeam);
+  }
+
+  getTeamName(colorTeam: string | null | undefined): string {
+    return this.authService.getTeamName(colorTeam);
+  }
   
   // States
   readonly leaderboard = signal<(LeaderboardUser & { rank: number })[]>([]);
   readonly loading = signal<boolean>(true);
   readonly hasKnockoutStarted = signal<boolean>(false);
+  readonly completedMatches = signal<number>(0);
 
   // Filters
   readonly searchQuery = signal<string>('');
@@ -119,6 +128,10 @@ export class LeaderboardComponent implements OnInit {
         this.hasKnockoutStarted.set(false);
       }
 
+      // Calculate completed matches count
+      const completedCount = matches.filter(m => m.status === 'completed').length;
+      this.completedMatches.set(completedCount);
+
       this.loading.set(false);
     } catch (err) {
       console.error('Failed to load detailed leaderboard data:', err);
@@ -146,17 +159,43 @@ export class LeaderboardComponent implements OnInit {
     }
   }
 
-  getRankBadgeClass(rank: number): string {
-    switch (rank) {
-      case 1:
-        return 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-[0_0_15px_rgba(245,158,11,0.4)]';
-      case 2:
-        return 'bg-gradient-to-r from-slate-300 to-slate-400 text-slate-950 font-black shadow-[0_0_15px_rgba(203,213,225,0.3)]';
-      case 3:
-        return 'bg-gradient-to-r from-amber-600 to-amber-700 text-white font-black shadow-[0_0_15px_rgba(180,83,9,0.3)]';
-      default:
-        return 'bg-white/5 text-gray-300 border border-white/5';
+  getTeamFilterClass(team: string, isSelected: boolean): string {
+    const base = 'inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs border cursor-pointer transition-all duration-200 uppercase tracking-wide shrink-0 ';
+    if (isSelected) {
+      switch (team.toLowerCase()) {
+        case 'all':
+          return base + 'bg-white text-slate-950 font-bold border-white shadow-[0_0_12px_rgba(255,255,255,0.3)]';
+        case 'red':
+          return base + 'bg-rose-500 text-slate-950 font-bold border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.35)]';
+        case 'yellow':
+          return base + 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.35)]';
+        case 'purple':
+          return base + 'bg-fuchsia-500 text-slate-950 font-bold border-fuchsia-400 shadow-[0_0_12px_rgba(217,70,239,0.35)]';
+        case 'blue':
+          return base + 'bg-sky-500 text-slate-950 font-bold border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.35)]';
+        default:
+          return base + 'bg-amber-500 text-slate-950 font-bold border-amber-400';
+      }
+    } else {
+      switch (team.toLowerCase()) {
+        case 'all':
+          return base + 'bg-white/2 text-gray-300 border-white/5 hover:bg-white/10 hover:text-white hover:border-white/20';
+        case 'red':
+          return base + 'bg-white/2 text-gray-300 border-white/5 hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/20';
+        case 'yellow':
+          return base + 'bg-white/2 text-gray-300 border-white/5 hover:bg-amber-500/10 hover:text-amber-400 hover:border-amber-500/20';
+        case 'purple':
+          return base + 'bg-white/2 text-gray-300 border-white/5 hover:bg-fuchsia-500/10 hover:text-fuchsia-400 hover:border-fuchsia-500/20';
+        case 'blue':
+          return base + 'bg-white/2 text-gray-300 border-white/5 hover:bg-sky-500/10 hover:text-sky-400 hover:border-sky-500/20';
+        default:
+          return base + 'bg-white/2 text-gray-300 border-white/5 hover:bg-white/5';
+      }
     }
+  }
+
+  getRankBadgeClass(rank: number): string {
+    return 'bg-white/5 text-gray-300 border border-white/5';
   }
 
   getStartIndex(): number {

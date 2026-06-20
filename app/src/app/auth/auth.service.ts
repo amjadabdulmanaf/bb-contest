@@ -10,7 +10,11 @@ export interface User {
   colorTeam: string;
   role: string;
   points: number;
+  rank?: number | null;
+  trend?: 'up' | 'down' | 'stable' | null;
+  previousRank?: number | null;
 }
+
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +37,40 @@ export class AuthService {
 
   readonly isAuthenticated = computed(() => !!this.currentUser());
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
+
+  getTeamLogo(colorTeam: string | null | undefined): string | null {
+    if (!colorTeam) return null;
+    const name = colorTeam.toLowerCase().trim();
+    switch (name) {
+      case 'red':
+        return `${this.apiBase}/uploads/teams/fiery-falcons.png`;
+      case 'purple':
+        return `${this.apiBase}/uploads/teams/purplections.png`;
+      case 'yellow':
+        return `${this.apiBase}/uploads/teams/royal-reflectors.png`;
+      case 'blue':
+        return `${this.apiBase}/uploads/teams/blue-hawks.png`;
+      default:
+        return null;
+    }
+  }
+
+  getTeamName(colorTeam: string | null | undefined): string {
+    if (!colorTeam) return '';
+    const name = colorTeam.toLowerCase().trim();
+    switch (name) {
+      case 'red':
+        return 'Fiery Falcons';
+      case 'purple':
+        return 'Purplections';
+      case 'yellow':
+        return 'Royal Reflectors';
+      case 'blue':
+        return 'Blue Hawks';
+      default:
+        return colorTeam;
+    }
+  }
 
   constructor(private router: Router) {
     this.restoreSession();
@@ -92,6 +130,7 @@ export class AuthService {
   }
 
   private refreshPromise: Promise<boolean> | null = null;
+  private profilePromise: Promise<boolean> | null = null;
 
   async refreshSession(): Promise<boolean> {
     if (this.refreshPromise) {
@@ -193,40 +232,50 @@ export class AuthService {
   }
 
   async fetchProfile(): Promise<boolean> {
-    let token = this.getToken();
-    if (!token) return false;
-
-    try {
-      let response = await fetch(`${this.apiBase}/auth/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        const refreshed = await this.refreshSession();
-        if (refreshed) {
-          token = this.getToken();
-          response = await fetch(`${this.apiBase}/auth/me`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-        }
-      }
-
-      if (!response.ok) {
-        throw new Error('Profile retrieval failed');
-      }
-
-      const userData: User = await response.json();
-      this.currentUser.set(userData);
-      return true;
-    } catch (err) {
-      this.clearTokens();
-      this.currentUser.set(null);
-      return false;
+    if (this.profilePromise) {
+      return this.profilePromise;
     }
+
+    this.profilePromise = (async () => {
+      let token = this.getToken();
+      if (!token) return false;
+
+      try {
+        let response = await fetch(`${this.apiBase}/auth/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401) {
+          const refreshed = await this.refreshSession();
+          if (refreshed) {
+            token = this.getToken();
+            response = await fetch(`${this.apiBase}/auth/me`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+          }
+        }
+
+        if (!response.ok) {
+          throw new Error('Profile retrieval failed');
+        }
+
+        const userData: User = await response.json();
+        this.currentUser.set(userData);
+        return true;
+      } catch (err) {
+        this.clearTokens();
+        this.currentUser.set(null);
+        return false;
+      } finally {
+        this.profilePromise = null;
+      }
+    })();
+
+    return this.profilePromise;
   }
 
   private async restoreSession(): Promise<void> {

@@ -44,3 +44,27 @@ export const authGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, st
   router.navigate(['/login']);
   return false;
 };
+
+export const guestGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+  const platformId = inject(PLATFORM_ID);
+  
+  if (!isPlatformBrowser(platformId)) {
+    return true;
+  }
+
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  const token = authService.getToken();
+  if (token && !authService.isAuthenticated()) {
+    await authService.fetchProfile();
+  }
+
+  if (authService.isAuthenticated()) {
+    const targetRoute = authService.isAdmin() ? '/admin' : '/dashboard';
+    router.navigate([targetRoute]);
+    return false;
+  }
+
+  return true;
+};

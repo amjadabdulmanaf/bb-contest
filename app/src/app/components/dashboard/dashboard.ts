@@ -22,9 +22,18 @@ export class DashboardComponent implements OnInit {
   readonly user = this.authService.currentUser;
   readonly isAdmin = this.authService.isAdmin;
 
+  getTeamLogo(colorTeam: string | null | undefined): string | null {
+    return this.authService.getTeamLogo(colorTeam);
+  }
+
+  getTeamName(colorTeam: string | null | undefined): string {
+    return this.authService.getTeamName(colorTeam);
+  }
+
   // Loaded data
   readonly leaderboard = signal<(LeaderboardUser & { rank: number })[]>([]);
   readonly colorLeaderboard = signal<ColorLeaderboardUser[]>([]);
+  readonly completedMatches = signal<number>(0);
   readonly activeLeaderboardTab = signal<'individual' | 'color'>('individual');
   readonly nextMatches = signal<Match[]>([]);
   readonly nextPredictions = signal<UserPrediction[]>([]);
@@ -126,6 +135,10 @@ export class DashboardComponent implements OnInit {
 
       // 2. Load Schedule & Predictions & Players
       const { teams, matches } = await this.predictorService.getSchedule();
+      
+      const completedCount = matches.filter(m => m.status === 'completed').length;
+      this.completedMatches.set(completedCount);
+
       this.teams = teams;
       this.players = await this.predictorService.getPlayers();
       const myPredictions = await this.predictorService.getMyPredictions();

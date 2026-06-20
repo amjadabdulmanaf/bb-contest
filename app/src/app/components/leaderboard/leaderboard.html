@@ -23,19 +23,24 @@
     class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 relative z-10 pt-6 md:pt-8 flex-grow flex flex-col min-h-0 pb-8 animate-fade-in-up">
 
     <!-- Header Title -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/5 pb-4 mb-6 gap-4">
+    <div class="flex flex-row items-center justify-between border-b border-white/5 pb-3 mb-4 md:mb-6 gap-2">
       <div>
         <h2
-          class="text-[1.5rem] md:text-[2rem] font-black tracking-wide bg-gradient-to-r from-amber-400 via-white to-amber-500 bg-clip-text text-transparent filter drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
-          🏆 DETAILED LEADERBOARD
+          class="text-lg sm:text-[1.5rem] md:text-[2rem] font-black tracking-wide bg-gradient-to-r from-amber-400 via-white to-amber-500 bg-clip-text text-transparent filter drop-shadow-[0_0_8px_rgba(255,255,255,0.1)] leading-none animate-pulse-slow">
+          🏆 <span class="hidden sm:inline">DETAILED </span>LEADERBOARD
         </h2>
-        <p class="text-xs md:text-sm text-gray-400 mt-1">Full breakdown of player ranks, points, and tie-breaker
-          statistics</p>
+        <div class="text-[0.7rem] md:text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 flex-wrap leading-none">
+          <span class="hidden sm:inline">Full breakdown of player ranks and statistics</span>
+          <span class="hidden sm:inline text-gray-600">•</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider text-[0.55rem] md:text-[0.62rem]">
+            {{ completedMatches() }} Matches Played
+          </span>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 shrink-0">
         <a routerLink="/dashboard"
-          class="no-underline text-xs font-bold py-2 px-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 hover:text-white transition-all flex items-center gap-2">
-          <span>← Back to Dashboard</span>
+          class="no-underline text-[0.72rem] sm:text-xs font-bold py-1.5 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 hover:text-white transition-all flex items-center gap-1">
+          <span>← Back<span class="hidden sm:inline"> to Dashboard</span></span>
         </a>
       </div>
     </div>
@@ -48,28 +53,39 @@
     } @else {
     <!-- Control Bar (Search + Filter) -->
     <div
-      class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white/2 border border-white/5 rounded-xl p-4 mb-6 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] backdrop-blur-md">
+      class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-4 bg-white/2 border border-white/5 rounded-xl p-3 md:p-4 mb-4 md:mb-6 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] backdrop-blur-md">
       <!-- Search Input -->
       <div class="relative flex-grow max-w-md">
-        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm">🔍</span>
         <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-          placeholder="Search by player name, email, or employee ID..."
-          class="w-full bg-[#05070f]/50 border border-white/10 rounded-lg py-2 pl-10 pr-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all" />
+          placeholder="Search name, email, ID..."
+          class="w-full bg-[#05070f]/50 border border-white/10 rounded-lg py-1.5 md:py-2 pl-8.5 md:pl-10 pr-8.5 md:pr-10 text-xs md:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all" />
         @if (searchQuery()) {
         <button (click)="searchQuery.set('')"
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white bg-transparent border-none cursor-pointer p-0 text-sm leading-none transition-colors">✕</button>
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white bg-transparent border-none cursor-pointer p-0 text-xs md:text-sm leading-none transition-colors">✕</button>
         }
       </div>
 
       <!-- Filter Buttons -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Filter by Team:</span>
-        <div class="flex flex-wrap gap-1.5">
+      <div class="flex flex-row items-center gap-2 shrink-0 min-w-0 w-full md:w-auto">
+        <span class="text-[0.7rem] md:text-xs font-extrabold text-gray-400 uppercase tracking-wider whitespace-nowrap">Filter<span class="hidden sm:inline"> by Team</span>:</span>
+        <div class="flex flex-nowrap items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-1 -mb-1 scroll-smooth">
           @for (team of availableTeams; track team) {
           <button (click)="selectedTeamFilter.set(team)"
-            [class]="selectedTeamFilter() === team ? 'bg-amber-500 text-slate-950 font-bold border-amber-400' : 'bg-white/2 text-gray-300 border-white/5 hover:bg-white/5'"
-            class="px-3 py-1.5 rounded-lg text-xs border cursor-pointer transition-all duration-200 uppercase tracking-wide">
-            {{ team }}
+            [class]="getTeamFilterClass(team, selectedTeamFilter() === team)">
+            @if (team === 'All') {
+              <span>ALL</span>
+            } @else {
+              <!-- Mobile view: colored box, Desktop view: text -->
+              <span class="md:hidden w-3 h-3 rounded-sm inline-block shrink-0"
+                [ngClass]="{
+                  'bg-rose-500': team.toLowerCase() === 'red',
+                  'bg-amber-500': team.toLowerCase() === 'yellow',
+                  'bg-fuchsia-500': team.toLowerCase() === 'purple',
+                  'bg-sky-500': team.toLowerCase() === 'blue'
+                }"></span>
+              <span class="hidden md:inline">{{ getTeamName(team) }}</span>
+            }
           </button>
           }
         </div>
@@ -84,17 +100,17 @@
           <thead>
             <tr class="bg-[#090b14]/80 border-b border-white/5">
               <th
-                class="p-3 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider w-20 text-center">
+                class="p-2 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider w-12 md:w-20 text-center">
                 Rank</th>
               <th
-                class="p-3 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider w-16 text-center">
+                class="p-3 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider w-16 text-center hidden md:table-cell">
                 Trend</th>
-              <th class="p-3 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider">Player</th>
+              <th class="p-2 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider">Player</th>
               <th
                 class="p-3 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider w-36 hidden md:table-cell">
                 Color Team</th>
               <th
-                class="p-3 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider text-center w-28 bg-white/2">
+                class="p-2 md:p-4 font-extrabold text-gray-500 uppercase text-[0.72rem] tracking-wider text-center w-16 md:w-28 bg-white/2">
                 Points</th>
               <th
                 class="p-3 md:p-4 font-extrabold text-amber-500 uppercase text-[0.72rem] tracking-wider text-center w-36 border-l border-white/5 hidden md:table-cell">
@@ -118,7 +134,7 @@
               [ngClass]="isCurrentUser(item) ? 'bg-gradient-to-r from-amber-500/12 to-transparent border-l-[4px] border-l-amber-500 shadow-[inset_0_0_12px_rgba(245,158,11,0.08)]' : 'hover:bg-white/[0.015] border-b border-white/3'"
               class="transition-colors border-b border-white/4">
               <!-- Rank column -->
-              <td class="p-3 md:p-4 text-sm font-bold text-center">
+              <td class="p-2 md:p-4 text-sm font-bold text-center">
                 <span [class]="getRankBadgeClass(item.rank)"
                   class="w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs">
                   @if (item.rank === 1) { 🥇 }
@@ -129,7 +145,7 @@
               </td>
 
               <!-- Trend column -->
-              <td class="p-3 md:p-4 text-xs font-bold text-center">
+              <td class="p-3 md:p-4 text-xs font-bold text-center hidden md:table-cell">
                 @if (item.previousRank == null) {
                 <span class="text-gray-600 bg-white/2 px-2 py-0.5 rounded-full select-none font-normal">-</span>
                 } @else if (item.previousRank > item.rank) {
@@ -147,11 +163,23 @@
               </td>
 
               <!-- Display name column -->
-              <td class="p-3 md:p-4 text-sm text-gray-200 font-semibold">
+              <td class="p-2 md:p-4 text-sm text-gray-200 font-semibold">
                 <div class="flex items-center gap-2 flex-wrap">
+                  <!-- Mobile-only Trend indicator in front of name -->
+                  @if (item.previousRank != null) {
+                    @if (item.previousRank > item.rank) {
+                      <span class="md:hidden text-[0.72rem] font-extrabold text-emerald-400 mr-0.5">▲{{ item.previousRank - item.rank }}</span>
+                    } @else if (item.previousRank < item.rank) {
+                      <span class="md:hidden text-[0.72rem] font-extrabold text-rose-400 mr-0.5">▼{{ item.rank - item.previousRank }}</span>
+                    } @else {
+                      <span class="md:hidden text-[0.72rem] font-extrabold text-gray-500 mr-0.5">=</span>
+                    }
+                  } @else {
+                    <span class="md:hidden text-[0.72rem] font-extrabold text-gray-600 mr-0.5">-</span>
+                  }
                   <span class="font-extrabold tracking-wide">{{ item.displayName }}</span>
                   @if (item.empId) {
-                  <span class="text-[0.68rem] text-gray-500 bg-white/3 px-1.5 py-0.25 rounded font-mono">#{{ item.empId
+                  <span class="text-[0.68rem] text-gray-500 bg-white/3 px-1.5 py-0.25 rounded font-mono hidden md:inline-block">#{{ item.empId
                     }}</span>
                   }
                   @if (isCurrentUser(item)) {
@@ -159,15 +187,17 @@
                     class="bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[0.62rem] rounded-full py-0.5 px-2 font-black tracking-wider uppercase shadow-[0_0_8px_rgba(59,130,246,0.2)]">You</span>
                   }
                 </div>
-                <span class="block text-[0.7rem] text-gray-500 mt-0.5 font-mono">{{ item.email }}</span>
+                <span class="hidden md:block text-[0.7rem] text-gray-500 mt-0.5 font-mono">{{ item.email }}</span>
                 <!-- Mobile-only stats badges -->
                 <div class="flex flex-wrap gap-1 mt-1.5 md:hidden">
                   @if (item.colorTeam) {
-                  <span [class]="getTeamBadgeClass(item.colorTeam)"
-                    class="px-1.5 py-0.5 rounded text-[0.62rem] uppercase tracking-wider font-extrabold inline-flex items-center gap-1">
-                    <span class="w-1 h-1 rounded-full bg-current"></span>
-                    {{ item.colorTeam }}
-                  </span>
+                  <span class="w-3.5 h-3.5 rounded-sm border border-white/5 inline-block shrink-0 align-middle"
+                    [ngClass]="{
+                      'bg-rose-500': item.colorTeam.toLowerCase() === 'red',
+                      'bg-amber-500': item.colorTeam.toLowerCase() === 'yellow',
+                      'bg-fuchsia-500': item.colorTeam.toLowerCase() === 'purple',
+                      'bg-sky-500': item.colorTeam.toLowerCase() === 'blue'
+                    }"></span>
                   }
                   <span
                     class="bg-amber-500/10 text-amber-400 border border-amber-500/15 px-1.5 py-0.5 rounded text-[0.62rem] font-bold flex items-center gap-0.5">
@@ -191,19 +221,19 @@
               </td>
 
               <!-- Color Team column -->
-              <td class="p-3 md:p-4 text-xs font-bold hidden md:table-cell">
+              <td class="p-3 md:p-4 text-xs font-bold hidden md:table-cell whitespace-nowrap">
                 <span [class]="getTeamBadgeClass(item.colorTeam)"
-                  class="px-2.5 py-1 rounded-full uppercase tracking-wider text-[0.68rem] inline-flex items-center gap-1.5">
+                  class="px-2.5 py-1 rounded-full uppercase tracking-wider text-[0.68rem] inline-flex items-center gap-1.5 whitespace-nowrap">
                   <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                  {{ item.colorTeam || 'No Team' }}
+                  {{ getTeamName(item.colorTeam) || 'No Team' }}
                 </span>
               </td>
 
               <!-- Points column -->
               <td
-                class="p-3 md:p-4 text-center font-black text-white text-base bg-white/2 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] border-r border-white/5">
+                class="p-2 md:p-4 text-center font-black text-white text-sm md:text-base bg-white/2 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] border-r border-white/5">
                 {{ item.points }} <span
-                  class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest block mt-0.5">PTS</span>
+                  class="text-[0.55rem] md:text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest block mt-0.5">PTS</span>
               </td>
 
               <!-- Exact score column -->
