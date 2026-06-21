@@ -14,9 +14,10 @@ export const authGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, st
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // If token exists but user profile is not fetched yet, wait for it
+  // If token or refresh token exists but user profile is not fetched yet, wait for it
   const token = authService.getToken();
-  if (token && !authService.isAuthenticated()) {
+  const refreshToken = authService.getRefreshToken();
+  if ((token || refreshToken) && !authService.isAuthenticated()) {
     await authService.fetchProfile();
   }
 
@@ -56,7 +57,8 @@ export const guestGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
   const router = inject(Router);
 
   const token = authService.getToken();
-  if (token && !authService.isAuthenticated()) {
+  const refreshToken = authService.getRefreshToken();
+  if ((token || refreshToken) && !authService.isAuthenticated()) {
     await authService.fetchProfile();
   }
 

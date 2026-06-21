@@ -238,6 +238,15 @@ export class AuthService {
 
     this.profilePromise = (async () => {
       let token = this.getToken();
+      if (!token) {
+        const refreshToken = this.getRefreshToken();
+        if (refreshToken) {
+          const refreshed = await this.refreshSession();
+          if (refreshed) {
+            token = this.getToken();
+          }
+        }
+      }
       if (!token) return false;
 
       try {
