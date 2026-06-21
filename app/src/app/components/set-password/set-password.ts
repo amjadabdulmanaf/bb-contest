@@ -18,6 +18,8 @@ export class SetPasswordComponent implements OnInit {
 
   readonly password = signal<string>('');
   readonly confirmPassword = signal<string>('');
+  readonly showPassword = signal<boolean>(false);
+  readonly showConfirmPassword = signal<boolean>(false);
 
   readonly token = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);

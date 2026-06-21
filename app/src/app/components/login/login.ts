@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
   readonly email = signal<string>('');
   readonly password = signal<string>('');
   readonly rememberMe = signal<boolean>(true);
+  readonly showPassword = signal<boolean>(false);
 
   readonly currentStep = signal<LoginStep>('email');
   readonly errorMessage = signal<string | null>(null);
@@ -111,6 +112,7 @@ export class LoginComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
     this.password.set('');
+    this.showPassword.set(false);
     this.currentStep.set('email');
   }
 }
