@@ -535,111 +535,111 @@
       </div>
     </div>
     }
-
-    <!-- Glowing Modal Backdrop -->
-    @if (showRankingPopup()) {
-    <div
-      class="fixed inset-0 z-[9999] flex items-start sm:items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-      <!-- Modal Container -->
-      <div
-        class="w-full max-w-4xl bg-[#090b14] border border-white/10 rounded-2xl p-5 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative flex flex-col gap-5 sm:gap-6 text-left my-20 sm:my-auto">
-
-        <!-- Close Button (X) -->
-        <button (click)="dismissRankingPopup()"
-          class="absolute top-4 right-4 text-gray-400 hover:text-white bg-transparent border-none cursor-pointer p-1 transition-colors focus:outline-none">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-5 h-5">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        <!-- Icon Header -->
-        <div class="flex items-center gap-3.5 pb-3 border-b border-white/5">
-          <div
-            class="w-11 h-11 flex items-center justify-center bg-gradient-to-br from-amber-400 to-yellow-600 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-            <span class="text-xl">⚖️</span>
-          </div>
-          <div>
-            <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-white m-0">Leaderboard Tie-Breaking
-            </h3>
-            <span class="text-[0.68rem] font-bold text-amber-500 uppercase tracking-widest block mt-0.5">Rules &
-              Priorities</span>
-          </div>
-        </div>
-
-        <!-- Description Body -->
-        <p class="m-0 text-gray-300 text-xs sm:text-[0.85rem] leading-relaxed">
-          We have introduced a tie-breaking priority system to ensure every player gets an accurate, individual ranking
-          when points are equal. If points are tied, players are sorted by:
-        </p>
-
-        <!-- Priorities Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
-          <!-- Card 1 -->
-          <div
-            class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-amber-500/20 transition-all duration-300">
-            <div class="flex items-center gap-2">
-              <span
-                class="w-6 h-6 flex items-center justify-center bg-amber-400/10 text-amber-400 font-extrabold text-xs rounded-full">1</span>
-              <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Exact Score</strong>
-            </div>
-            <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
-              More predictions matching the exact scoreline gets top priority.
-            </p>
-          </div>
-          <!-- Card 2 -->
-          <div
-            class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-blue-500/20 transition-all duration-300">
-            <div class="flex items-center gap-2">
-              <span
-                class="w-6 h-6 flex items-center justify-center bg-blue-400/10 text-blue-400 font-extrabold text-xs rounded-full">2</span>
-              <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Goal Scorer</strong>
-            </div>
-            <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
-              More predictions with the correct goal scorer gets second priority.
-            </p>
-          </div>
-          <!-- Card 3 -->
-          <div
-            class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-emerald-500/20 transition-all duration-300">
-            <div class="flex items-center gap-2">
-              <span
-                class="w-6 h-6 flex items-center justify-center bg-emerald-400/10 text-emerald-400 font-extrabold text-xs rounded-full">3</span>
-              <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Result Outcome</strong>
-            </div>
-            <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
-              More predictions with correct outcomes (win/draw) gets third priority.
-            </p>
-          </div>
-          <!-- Card 4 -->
-          <div
-            class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-fuchsia-500/20 transition-all duration-300">
-            <div class="flex items-center gap-2">
-              <span
-                class="w-6 h-6 flex items-center justify-center bg-fuchsia-400/10 text-fuchsia-400 font-extrabold text-xs rounded-full">4</span>
-              <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Match Time</strong>
-            </div>
-            <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
-              Correct game finish time gets fourth priority (Knockouts Only).
-            </p>
-          </div>
-        </div>
-
-        <!-- Bottom Footer Actions -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/5 pt-4">
-          <p class="m-0 text-gray-400 text-[0.7rem] sm:text-xs flex items-center gap-1.5">
-            <span>💡</span>
-            <span class="leading-relaxed">If all tie-breakers are equal, players share the rank and are displayed
-              alphabetically.</span>
-          </p>
-          <button (click)="dismissRankingPopup()"
-            class="w-full sm:w-auto sm:min-w-[140px] bg-gradient-to-r from-[#00f2fe] to-[#4facfe] text-black border-none rounded-xl py-2.5 px-5 text-xs sm:text-sm font-extrabold uppercase tracking-[1.5px] cursor-pointer shadow-[0_4px_15px_rgba(0,242,254,0.25)] transition-all duration-300 hover:shadow-[0_8px_20px_rgba(0,242,254,0.4)] hover:-translate-y-[1px] active:translate-y-0 shrink-0">
-            Got it!
-          </button>
-        </div>
-
-      </div>
-    </div>
-    }
   </div>
 </div>
+
+<!-- Glowing Modal Backdrop -->
+@if (showRankingPopup()) {
+<div
+  class="fixed inset-0 z-[9999] flex items-start justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+  <!-- Modal Container -->
+  <div
+    class="w-full max-w-4xl bg-[#090b14] border border-white/10 rounded-2xl p-5 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative flex flex-col gap-5 sm:gap-6 text-left mt-2 mb-6 sm:mt-8 sm:mb-12 md:mt-12 md:mb-16">
+
+    <!-- Close Button (X) -->
+    <button (click)="dismissRankingPopup()"
+      class="absolute top-4 right-4 text-gray-400 hover:text-white bg-transparent border-none cursor-pointer p-1 transition-colors focus:outline-none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-5 h-5">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Icon Header -->
+    <div class="flex items-center gap-3.5 pb-3 border-b border-white/5">
+      <div
+        class="w-11 h-11 flex items-center justify-center bg-gradient-to-br from-amber-400 to-yellow-600 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+        <span class="text-xl">⚖️</span>
+      </div>
+      <div>
+        <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-white m-0">Leaderboard Tie-Breaking
+        </h3>
+        <span class="text-[0.68rem] font-bold text-amber-500 uppercase tracking-widest block mt-0.5">Rules &
+          Priorities</span>
+      </div>
+    </div>
+
+    <!-- Description Body -->
+    <p class="m-0 text-gray-300 text-xs sm:text-[0.85rem] leading-relaxed">
+      We have introduced a tie-breaking priority system to ensure every player gets an accurate, individual ranking
+      when points are equal. If points are tied, players are sorted by:
+    </p>
+
+    <!-- Priorities Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+      <!-- Card 1 -->
+      <div
+        class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-2">
+          <span
+            class="w-6 h-6 flex items-center justify-center bg-amber-400/10 text-amber-400 font-extrabold text-xs rounded-full">1</span>
+          <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Exact Score</strong>
+        </div>
+        <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
+          More predictions matching the exact scoreline gets top priority.
+        </p>
+      </div>
+      <!-- Card 2 -->
+      <div
+        class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-blue-500/20 transition-all duration-300">
+        <div class="flex items-center gap-2">
+          <span
+            class="w-6 h-6 flex items-center justify-center bg-blue-400/10 text-blue-400 font-extrabold text-xs rounded-full">2</span>
+          <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Goal Scorer</strong>
+        </div>
+        <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
+          More predictions with the correct goal scorer gets second priority.
+        </p>
+      </div>
+      <!-- Card 3 -->
+      <div
+        class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-emerald-500/20 transition-all duration-300">
+        <div class="flex items-center gap-2">
+          <span
+            class="w-6 h-6 flex items-center justify-center bg-emerald-400/10 text-emerald-400 font-extrabold text-xs rounded-full">3</span>
+          <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Result Outcome</strong>
+        </div>
+        <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
+          More predictions with correct outcomes (win/draw) gets third priority.
+        </p>
+      </div>
+      <!-- Card 4 -->
+      <div
+        class="bg-white/2 border border-white/5 p-3.5 sm:p-4 rounded-xl flex flex-col gap-1.5 sm:gap-2 hover:border-fuchsia-500/20 transition-all duration-300">
+        <div class="flex items-center gap-2">
+          <span
+            class="w-6 h-6 flex items-center justify-center bg-fuchsia-400/10 text-fuchsia-400 font-extrabold text-xs rounded-full">4</span>
+          <strong class="text-white text-xs sm:text-[0.85rem] font-bold">Match Time</strong>
+        </div>
+        <p class="m-0 text-gray-400 text-[0.72rem] sm:text-xs leading-relaxed">
+          Correct game finish time gets fourth priority (Knockouts Only).
+        </p>
+      </div>
+    </div>
+
+    <!-- Bottom Footer Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/5 pt-4">
+      <p class="m-0 text-gray-400 text-[0.7rem] sm:text-xs flex items-center gap-1.5">
+        <span>💡</span>
+        <span class="leading-relaxed">If all tie-breakers are equal, players share the rank and are displayed
+          alphabetically.</span>
+      </p>
+      <button (click)="dismissRankingPopup()"
+        class="w-full sm:w-auto sm:min-w-[140px] bg-gradient-to-r from-[#00f2fe] to-[#4facfe] text-black border-none rounded-xl py-2.5 px-5 text-xs sm:text-sm font-extrabold uppercase tracking-[1.5px] cursor-pointer shadow-[0_4px_15px_rgba(0,242,254,0.25)] transition-all duration-300 hover:shadow-[0_8px_20px_rgba(0,242,254,0.4)] hover:-translate-y-[1px] active:translate-y-0 shrink-0">
+        Got it!
+      </button>
+    </div>
+
+  </div>
+</div>
+}

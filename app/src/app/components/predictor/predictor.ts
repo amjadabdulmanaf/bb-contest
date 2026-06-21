@@ -22,6 +22,7 @@ interface EnrichedMatch extends Match {
 export class PredictorComponent implements OnInit {
   private readonly predictorService = inject(PredictorService);
   private readonly authService = inject(AuthService);
+  readonly currentUser = this.authService.currentUser;
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly platformId = inject(PLATFORM_ID);
@@ -249,6 +250,121 @@ export class PredictorComponent implements OnInit {
     }
   }
 
+  getTeamName(colorTeam: string | null | undefined): string {
+    return this.authService.getTeamName(colorTeam);
+  }
+
+  calculatePredictionPoints(match: Match, pred: any): { points: number; label: string } {
+    let pointsEarned = 0;
+    let pointsLabel = '';
+
+    if (match.status === 'completed' && match.homeScore !== null && match.awayScore !== null && pred && pred.homeScore !== null && pred.awayScore !== null) {
+      const actHome = match.homeScore;
+      const actAway = match.awayScore;
+      const predHome = pred.homeScore;
+      const predAway = pred.awayScore;
+
+      let scorePoints = 0;
+      let resolutionPoints = 0;
+
+      if (match.type === 'knockout') {
+        const actWinner = actHome > actAway ? match.homeTeamId : (actHome < actAway ? match.awayTeamId : match.actualWinnerId);
+        const predWinner = predHome > predAway ? match.homeTeamId : (predHome < predAway ? match.awayTeamId : pred.predictedWinnerId);
+
+        let isExact = false;
+        if (actHome === predHome && actAway === predAway) {
+          if (actHome === actAway) {
+            if (actWinner && predWinner && actWinner === predWinner) {
+              isExact = true;
+            }
+          } else {
+            isExact = true;
+          }
+        }
+
+        if (isExact) {
+          scorePoints = 30;
+        } else if (actWinner && predWinner && actWinner === predWinner) {
+          scorePoints = 10;
+        }
+
+        // Resolution Time prediction (10 points)
+        if (pred.predictedResolutionTime && pred.predictedResolutionTime === match.resolutionTime) {
+          resolutionPoints = 10;
+        }
+      } else {
+        const actualHomeWin = actHome > actAway;
+        const actualAwayWin = actHome < actAway;
+        const actualDraw = actHome === actAway;
+
+        const predHomeWin = predHome > predAway;
+        const predAwayWin = predHome < predAway;
+        const predDraw = predHome === predAway;
+
+        if (actHome === predHome && actAway === predAway) {
+          scorePoints = 30;
+        } else if (
+          (actualHomeWin && predHomeWin) ||
+          (actualAwayWin && predAwayWin) ||
+          (actualDraw && predDraw)
+        ) {
+          scorePoints = 10;
+        }
+      }
+
+      let scorerPoints = 0;
+      if (pred.predictedScorerId) {
+        const actualScorersList = match.actualScorers || [];
+        if (actHome === 0 && actAway === 0) {
+          if (pred.predictedScorerId === 'no-scorer') {
+            scorerPoints = 10;
+          }
+        } else {
+          if (actualScorersList.includes(pred.predictedScorerId)) {
+            scorerPoints = 10;
+          }
+        }
+      }
+
+      pointsEarned = scorePoints + resolutionPoints + scorerPoints;
+      const resultPts = scorePoints > 0 ? 10 : 0;
+      const exactPts = scorePoints === 30 ? 20 : 0;
+      pointsLabel = `${pointsEarned} pts (Result: +${resultPts}, Score: +${exactPts}, Scorer: +${scorerPoints}${match.type === 'knockout' ? `, Time: +${resolutionPoints}` : ''})`;
+    } else {
+      pointsLabel = 'No Prediction (+0 pts)';
+    }
+
+    return { points: pointsEarned, label: pointsLabel };
+  }
+
+  // View Predictions Modal state
+  readonly showPredictionsModal = signal<boolean>(false);
+  readonly selectedFixture = signal<EnrichedMatch | null>(null);
+  readonly matchPredictions = signal<any[]>([]);
+  readonly loadingPredictions = signal<boolean>(false);
+
+  async openPredictionsModal(fixture: EnrichedMatch): Promise<void> {
+    this.selectedFixture.set(fixture);
+    this.showPredictionsModal.set(true);
+    this.loadingPredictions.set(true);
+    this.matchPredictions.set([]);
+
+    try {
+      const predictions = await this.predictorService.getMatchPredictions(fixture.id);
+      this.matchPredictions.set(predictions);
+    } catch (err) {
+      console.error('Failed to load predictions for match:', err);
+    } finally {
+      this.loadingPredictions.set(false);
+    }
+  }
+
+  closePredictionsModal(): void {
+    this.showPredictionsModal.set(false);
+    this.selectedFixture.set(null);
+    this.matchPredictions.set([]);
+  }
+
   async loadPredictorData(): Promise<void> {
     try {
       this.loading.set(true);
@@ -279,88 +395,10 @@ export class PredictorComponent implements OnInit {
         let pointsEarned = 0;
         let pointsLabel = '';
 
-        if (match.status === 'completed' && match.homeScore !== null && match.awayScore !== null && pred && pred.homeScore !== null && pred.awayScore !== null) {
-          const actHome = match.homeScore;
-          const actAway = match.awayScore;
-          const predHome = pred.homeScore;
-          const predAway = pred.awayScore;
-
-          const actualHomeWin = actHome > actAway;
-          const actualAwayWin = actHome < actAway;
-          const actualDraw = actHome === actAway;
-
-          const predHomeWin = predHome > predAway;
-          const predAwayWin = predHome < predAway;
-          const predDraw = predHome === predAway;
-
-          let scorePoints = 0;
-          let resolutionPoints = 0;
-
-          if (match.type === 'knockout') {
-            const actWinner = actHome > actAway ? match.homeTeamId : (actHome < actAway ? match.awayTeamId : match.actualWinnerId);
-            const predWinner = predHome > predAway ? match.homeTeamId : (predHome < predAway ? match.awayTeamId : pred.predictedWinnerId);
-
-            let isExact = false;
-            if (actHome === predHome && actAway === predAway) {
-              if (actHome === actAway) {
-                if (actWinner && predWinner && actWinner === predWinner) {
-                  isExact = true;
-                }
-              } else {
-                isExact = true;
-              }
-            }
-
-            if (isExact) {
-              scorePoints = 30;
-            } else if (actWinner && predWinner && actWinner === predWinner) {
-              scorePoints = 10;
-            }
-
-            // Resolution Time prediction (10 points)
-            if (pred.predictedResolutionTime && pred.predictedResolutionTime === match.resolutionTime) {
-              resolutionPoints = 10;
-            }
-          } else {
-            const actualHomeWin = actHome > actAway;
-            const actualAwayWin = actHome < actAway;
-            const actualDraw = actHome === actAway;
-
-            const predHomeWin = predHome > predAway;
-            const predAwayWin = predHome < predAway;
-            const predDraw = predHome === predAway;
-
-            if (actHome === predHome && actAway === predAway) {
-              scorePoints = 30;
-            } else if (
-              (actualHomeWin && predHomeWin) ||
-              (actualAwayWin && predAwayWin) ||
-              (actualDraw && predDraw)
-            ) {
-              scorePoints = 10;
-            }
-          }
-
-          let scorerPoints = 0;
-          if (pred.predictedScorerId) {
-            const actualScorersList = match.actualScorers || [];
-            if (actHome === 0 && actAway === 0) {
-              if (pred.predictedScorerId === 'no-scorer') {
-                scorerPoints = 10;
-              }
-            } else {
-              if (actualScorersList.includes(pred.predictedScorerId)) {
-                scorerPoints = 10;
-              }
-            }
-          }
-
-          pointsEarned = scorePoints + resolutionPoints + scorerPoints;
-          const resultPts = scorePoints > 0 ? 10 : 0;
-          const exactPts = scorePoints === 30 ? 20 : 0;
-          pointsLabel = `${pointsEarned} pts (Result: +${resultPts}, Score: +${exactPts}, Scorer: +${scorerPoints}${match.type === 'knockout' ? `, Time: +${resolutionPoints}` : ''})`;
-        } else if (match.status === 'completed') {
-          pointsLabel = 'No Prediction (+0 pts)';
+        if (match.status === 'completed') {
+          const ptsResult = this.calculatePredictionPoints(match, pred);
+          pointsEarned = ptsResult.points;
+          pointsLabel = ptsResult.label;
         } else if (isLocked) {
           pointsLabel = 'Locked (No points yet)';
         } else {
