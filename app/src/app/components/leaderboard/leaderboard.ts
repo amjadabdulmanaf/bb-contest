@@ -36,12 +36,16 @@ export class LeaderboardComponent implements OnInit {
   readonly searchQuery = signal<string>('');
   readonly selectedTeamFilter = signal<string>('All');
 
+  // Sorting
+  readonly sortColumn = signal<'rank' | 'player' | 'colorTeam' | 'points' | 'exactMatches' | 'goalScorers' | 'results'>('rank');
+  readonly sortDirection = signal<'asc' | 'desc'>('asc');
+
   // Pagination
   readonly currentPage = signal<number>(1);
   readonly itemsPerPage = signal<number>(10);
 
   readonly totalPages = computed(() => {
-    return Math.ceil(this.filteredLeaderboard().length / this.itemsPerPage());
+    return Math.ceil(this.sortedLeaderboard().length / this.itemsPerPage());
   });
 
   readonly paginatedLeaderboard = computed(() => {
@@ -49,17 +53,74 @@ export class LeaderboardComponent implements OnInit {
     const limit = this.itemsPerPage();
     const start = (page - 1) * limit;
     const end = start + limit;
-    return this.filteredLeaderboard().slice(start, end);
+    return this.sortedLeaderboard().slice(start, end);
   });
 
   constructor() {
     effect(() => {
-      // Reset to page 1 when query or filter changes
+      // Reset to page 1 when query, filter, or sorting changes
       this.searchQuery();
       this.selectedTeamFilter();
+      this.sortColumn();
+      this.sortDirection();
       this.currentPage.set(1);
     });
   }
+
+  // Sorted and Filtered Leaderboard
+  readonly sortedLeaderboard = computed(() => {
+    const list = [...this.filteredLeaderboard()];
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    const isAsc = dir === 'asc';
+
+    return list.sort((a, b) => {
+      let valA: any;
+      let valB: any;
+
+      switch (col) {
+        case 'rank':
+          valA = a.rank;
+          valB = b.rank;
+          break;
+        case 'player':
+          valA = a.displayName.toLowerCase();
+          valB = b.displayName.toLowerCase();
+          break;
+        case 'colorTeam':
+          valA = (this.getTeamName(a.colorTeam) || '').toLowerCase();
+          valB = (this.getTeamName(b.colorTeam) || '').toLowerCase();
+          break;
+        case 'points':
+          valA = a.points;
+          valB = b.points;
+          break;
+        case 'exactMatches':
+          valA = a.exactMatches;
+          valB = b.exactMatches;
+          break;
+        case 'goalScorers':
+          valA = a.goalScorers;
+          valB = b.goalScorers;
+          break;
+        case 'results':
+          valA = a.results;
+          valB = b.results;
+          break;
+        default:
+          return 0;
+      }
+
+      if (valA < valB) return isAsc ? -1 : 1;
+      if (valA > valB) return isAsc ? 1 : -1;
+
+      // Secondary sort: fall back to rank ascending (default order)
+      if (col !== 'rank') {
+        return a.rank - b.rank;
+      }
+      return 0;
+    });
+  });
 
   // Filtered Leaderboard
   readonly filteredLeaderboard = computed(() => {
@@ -252,6 +313,19 @@ export class LeaderboardComponent implements OnInit {
     const targetPage = typeof page === 'number' ? page : parseInt(page, 10);
     if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= this.totalPages()) {
       this.currentPage.set(targetPage);
+    }
+  }
+
+  toggleSort(column: 'rank' | 'player' | 'colorTeam' | 'points' | 'exactMatches' | 'goalScorers' | 'results'): void {
+    if (this.sortColumn() === column) {
+      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortColumn.set(column);
+      if (['points', 'exactMatches', 'goalScorers', 'results'].includes(column)) {
+        this.sortDirection.set('desc');
+      } else {
+        this.sortDirection.set('asc');
+      }
     }
   }
 }
