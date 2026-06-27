@@ -86,7 +86,7 @@
                 </div>
 
                 <!-- Group Info (Right on Mobile, Middle on Desktop) -->
-                <div class="order-3 text-[0.7rem] font-semibold text-gray-400 md:order-2 md:text-[0.8rem]">
+                <div class="order-3 text-[0.7rem] font-semibold text-gray-400 md:order-2 md:text-[0.8rem] whitespace-nowrap">
                   @if (match.type === 'knockout') {
                   {{ match.group || 'Knockout Stage' }}
                   } @else {
@@ -222,14 +222,12 @@
                   <button type="button" (click)="nextPredictions()[i].predictedWinnerId = match.homeTeamId"
                     [ngClass]="nextPredictions()[i].predictedWinnerId === match.homeTeamId ? 'bg-amber-500 text-white font-bold' : 'bg-transparent text-gray-400 hover:text-white'"
                     class="py-0.5 px-2 md:py-1 md:px-3 rounded-md text-[0.7rem] md:text-xs border-none cursor-pointer transition-all duration-200">
-                    {{ match.homeTeam?.flag }} <span class="opacity-75 text-[0.62rem] md:text-[0.68rem]">#{{
-                      match.homeTeam?.fifaRanking || 'N/A' }}</span> {{ match.homeTeam?.name }}
+                    {{ match.homeTeam?.flag }} {{ match.homeTeam?.name }}
                   </button>
                   <button type="button" (click)="nextPredictions()[i].predictedWinnerId = match.awayTeamId"
                     [ngClass]="nextPredictions()[i].predictedWinnerId === match.awayTeamId ? 'bg-amber-500 text-white font-bold' : 'bg-transparent text-gray-400 hover:text-white'"
                     class="py-0.5 px-2 md:py-1 md:px-3 rounded-md text-[0.7rem] md:text-xs border-none cursor-pointer transition-all duration-200">
-                    {{ match.awayTeam?.name }} <span class="opacity-75 text-[0.62rem] md:text-[0.68rem]">#{{
-                      match.awayTeam?.fifaRanking || 'N/A' }}</span> {{ match.awayTeam?.flag }}
+                    {{ match.awayTeam?.name }} {{ match.awayTeam?.flag }}
                   </button>
                 </div>
               </div>

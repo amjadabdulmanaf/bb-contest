@@ -141,10 +141,10 @@
           [ngClass]="getFixtureCardClass(fixture)" [class.z-50]="activeSearchMatchId === fixture.id">
           <!-- Match Info Top Row -->
           <div
-            class="w-full flex items-center justify-between text-[0.72rem] sm:text-xs border-b border-white/5 pb-2 mb-3 gap-2">
+            class="w-full flex items-center justify-between text-[0.72rem] sm:text-xs border-b border-white/5 pb-2 mb-3 gap-1 sm:gap-2">
             <!-- Left: Match Number -->
             <div class="flex-1 text-left">
-              <span class="text-[0.75rem] font-bold text-gray-500 uppercase tracking-[0.5px]">
+              <span class="text-[0.7rem] sm:text-[0.75rem] font-bold text-gray-500 uppercase tracking-[0.5px] whitespace-nowrap">
                 Match #{{ fixture.matchNumber }}
               </span>
             </div>
@@ -159,7 +159,7 @@
 
             <!-- Right: Group/Stage Info -->
             <div class="flex-1 text-right">
-              <span class="text-[0.8rem] font-bold text-white uppercase tracking-[0.5px]">
+              <span class="text-[0.7rem] sm:text-[0.8rem] font-bold text-white uppercase tracking-[0.5px] whitespace-nowrap">
                 @if (fixture.type === 'knockout') {
                 {{ fixture.group || 'Knockout Stage' }}
                 } @else {
@@ -472,10 +472,7 @@
                                 : 'bg-transparent text-gray-400 hover:text-white'
                             "
                   class="py-0.5 px-2 md:py-1 md:px-3 rounded-md text-[0.7rem] md:text-xs border-none cursor-pointer transition-all duration-200">
-                  {{ fixture.homeTeam?.flag }}
-                  <span class="opacity-75 text-[0.62rem] md:text-[0.68rem]">#{{ fixture.homeTeam?.fifaRanking || 'N/A'
-                    }}</span>
-                  {{ fixture.homeTeam?.name }}
+                  {{ fixture.homeTeam?.flag }} {{ fixture.homeTeam?.name }}
                 </button>
                 <button type="button" (click)="
                               localWinners[fixture.id] = fixture.awayTeamId;
@@ -486,10 +483,7 @@
                                 : 'bg-transparent text-gray-400 hover:text-white'
                             "
                   class="py-0.5 px-2 md:py-1 md:px-3 rounded-md text-[0.7rem] md:text-xs border-none cursor-pointer transition-all duration-200">
-                  {{ fixture.awayTeam?.name }}
-                  <span class="opacity-75 text-[0.62rem] md:text-[0.68rem]">#{{ fixture.awayTeam?.fifaRanking || 'N/A'
-                    }}</span>
-                  {{ fixture.awayTeam?.flag }}
+                  {{ fixture.awayTeam?.name }} {{ fixture.awayTeam?.flag }}
                 </button>
               </div>
             </div>
