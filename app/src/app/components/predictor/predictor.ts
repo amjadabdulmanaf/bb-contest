@@ -79,6 +79,7 @@ export class PredictorComponent implements OnInit {
     const scores = this.localScores[fixtureId];
     const scorerId = this.localScorers[fixtureId];
     const winnerId = this.localWinners[fixtureId];
+    const resTime = this.localResolutionTimes[fixtureId];
 
     const hasHome = scores && scores.homeScore !== null && scores.homeScore !== undefined;
     const hasAway = scores && scores.awayScore !== null && scores.awayScore !== undefined;
@@ -90,8 +91,12 @@ export class PredictorComponent implements OnInit {
     if (!hasHome || !hasAway || !hasScorer) return true;
 
     const fixture = this.fixtures.find(f => f.id === fixtureId);
-    if (fixture && fixture.type === 'knockout' && scores.homeScore === scores.awayScore) {
-      if (!winnerId) return true;
+    if (fixture && fixture.type === 'knockout') {
+      if (scores.homeScore === scores.awayScore) {
+        if (!winnerId) return true;
+      } else {
+        if (!resTime) return true;
+      }
     }
 
     return false;
@@ -588,7 +593,7 @@ export class PredictorComponent implements OnInit {
           awayScore: scores.awayScore,
           predictedScorerId: scorerId || null,
           predictedWinnerId: fixture.type === 'knockout' ? (scores.homeScore === scores.awayScore ? winnerId : (scores.homeScore > scores.awayScore ? fixture.homeTeamId : fixture.awayTeamId)) : null,
-          predictedResolutionTime: fixture.type === 'knockout' ? (scores.homeScore === scores.awayScore ? 'Penalty Shootout' : (resTime || 'Normal Time')) : null
+          predictedResolutionTime: fixture.type === 'knockout' ? (scores.homeScore === scores.awayScore ? 'Penalty Shootout' : (resTime || null)) : null
         });
       }
     }

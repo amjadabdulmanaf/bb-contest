@@ -245,9 +245,11 @@
                   Penalty Shootout
                 </span>
                 } @else {
-                <select [ngModel]="nextPredictions()[i].predictedResolutionTime || 'Normal Time'"
+                <select [ngModel]="nextPredictions()[i].predictedResolutionTime || ''"
                   (ngModelChange)="nextPredictions()[i].predictedResolutionTime = $event"
+                  [ngClass]="{ 'border-rose-500/60 focus:border-rose-500': shouldShowValidationError(i) && !nextPredictions()[i]?.predictedResolutionTime }"
                   class="bg-[#05070f]/50 border border-white/10 rounded-lg py-0.5 px-1.5 md:py-1 md:px-2 text-[0.7rem] md:text-xs text-white focus:outline-none focus:border-blue-500">
+                  <option value="" disabled class="bg-[#0d142a] text-gray-400">Select Match Ending Time</option>
                   <option value="Normal Time" class="bg-[#0d142a] text-white">Normal Time</option>
                   <option value="Extra Time" class="bg-[#0d142a] text-white">Extra Time</option>
                 </select>

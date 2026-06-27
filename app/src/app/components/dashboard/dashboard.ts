@@ -270,7 +270,7 @@ export class DashboardComponent implements OnInit {
           pred.predictedResolutionTime = 'Penalty Shootout';
         } else {
           pred.predictedWinnerId = pred.homeScore! > pred.awayScore! ? match.homeTeamId : match.awayTeamId;
-          pred.predictedResolutionTime = pred.predictedResolutionTime || 'Normal Time';
+          pred.predictedResolutionTime = pred.predictedResolutionTime || null;
         }
       } else {
         pred.predictedWinnerId = null;
@@ -350,8 +350,12 @@ export class DashboardComponent implements OnInit {
 
     if (!hasHome || !hasAway || !hasScorer) return true;
 
-    if (match.type === 'knockout' && pred.homeScore === pred.awayScore) {
-      if (!pred.predictedWinnerId) return true;
+    if (match.type === 'knockout') {
+      if (pred.homeScore === pred.awayScore) {
+        if (!pred.predictedWinnerId) return true;
+      } else {
+        if (!pred.predictedResolutionTime) return true;
+      }
     }
 
     return false;

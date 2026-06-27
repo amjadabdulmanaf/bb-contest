@@ -503,10 +503,17 @@
                 Penalty Shootout
               </span>
               } @else {
-              <select [ngModel]="localResolutionTimes[fixture.id] || 'Normal Time'" (ngModelChange)="
+              <select [ngModel]="localResolutionTimes[fixture.id] || ''" (ngModelChange)="
                             localResolutionTimes[fixture.id] = $event; dirtyMatchIds.add(fixture.id)
                           "
+                [ngClass]="{
+                            'border-rose-500/60':
+                              shouldShowValidationError(fixture.id) && !localResolutionTimes[fixture.id]
+                          }"
                 class="bg-[#05070f]/50 border border-white/10 rounded-lg py-0.5 px-1.5 md:py-1 md:px-2 text-[0.7rem] md:text-xs text-white focus:outline-none focus:border-blue-500">
+                <option value="" disabled class="bg-[#0d142a] text-gray-400">
+                  Select Match Ending Time
+                </option>
                 <option value="Normal Time" class="bg-[#0d142a] text-white">
                   Normal Time
                 </option>
