@@ -200,37 +200,57 @@ export class AdminService {
     return savedMatch;
   }
 
-  async recalculateLeaderboardPoints(): Promise<void> {
-    // 0. Snapshot current ranks of active users before recalculating
-    const activeUsers = await this.userRepository.createQueryBuilder('user')
-      .where('user.role != :role', { role: 'admin' })
-      .andWhere(qb => {
-        const subQuery = qb.subQuery()
-          .select('1')
-          .from(UserPrediction, 'prediction')
-          .where('prediction.userId = user.id')
-          .andWhere('prediction.homeScore IS NOT NULL')
-          .andWhere('prediction.awayScore IS NOT NULL')
-          .getQuery();
-        return 'EXISTS ' + subQuery;
-      })
-      .orderBy('user.points', 'DESC')
-      .addOrderBy('user.displayName', 'ASC')
-      .getMany();
+  async recalculateLeaderboardPoints(updatePreviousRank = true): Promise<void> {
+    if (updatePreviousRank) {
+      // 0. Snapshot current ranks of active users before recalculating
+      const activeUsers = await this.userRepository.createQueryBuilder('user')
+        .where('user.role != :role', { role: 'admin' })
+        .andWhere(qb => {
+          const subQuery = qb.subQuery()
+            .select('1')
+            .from(UserPrediction, 'prediction')
+            .where('prediction.userId = user.id')
+            .andWhere('prediction.homeScore IS NOT NULL')
+            .andWhere('prediction.awayScore IS NOT NULL')
+            .getQuery();
+          return 'EXISTS ' + subQuery;
+        })
+        .orderBy('user.points', 'DESC')
+        .addOrderBy('user.exactMatches', 'DESC')
+        .addOrderBy('user.goalScorers', 'DESC')
+        .addOrderBy('user.results', 'DESC')
+        .addOrderBy('user.times', 'DESC')
+        .addOrderBy('user.displayName', 'ASC')
+        .getMany();
 
-    const activeUserIds = new Set(activeUsers.map(u => u.id));
+      const activeUserIds = new Set(activeUsers.map(u => u.id));
 
-    for (let i = 0; i < activeUsers.length; i++) {
-      activeUsers[i].previousRank = i + 1;
-      await this.userRepository.save(activeUsers[i]);
-    }
+      for (let i = 0; i < activeUsers.length; i++) {
+        let rank = i + 1;
+        for (let j = i - 1; j >= 0; j--) {
+          if (
+            activeUsers[j].points === activeUsers[i].points &&
+            activeUsers[j].exactMatches === activeUsers[i].exactMatches &&
+            activeUsers[j].goalScorers === activeUsers[i].goalScorers &&
+            activeUsers[j].results === activeUsers[i].results &&
+            activeUsers[j].times === activeUsers[i].times
+          ) {
+            rank = j + 1;
+          } else {
+            break;
+          }
+        }
+        activeUsers[i].previousRank = rank;
+        await this.userRepository.save(activeUsers[i]);
+      }
 
-    const allUsers = await this.userRepository.find();
-    for (const u of allUsers) {
-      if (u.role !== 'admin' && !activeUserIds.has(u.id)) {
-        if (u.previousRank !== null) {
-          u.previousRank = null;
-          await this.userRepository.save(u);
+      const allUsers = await this.userRepository.find();
+      for (const u of allUsers) {
+        if (u.role !== 'admin' && !activeUserIds.has(u.id)) {
+          if (u.previousRank !== null) {
+            u.previousRank = null;
+            await this.userRepository.save(u);
+          }
         }
       }
     }
@@ -250,6 +270,10 @@ export class AdminService {
 
       const predictions = await this.predictionRepository.find({ where: { userId: user.id } });
       let totalPoints = 0;
+      let exactMatchesCount = 0;
+      let goalScorersCount = 0;
+      let resultsCount = 0;
+      let timesCount = 0;
 
       for (const pred of predictions) {
         const match = matchesMap.get(pred.matchId);
@@ -264,11 +288,15 @@ export class AdminService {
           continue; // Missing score data
         }
 
+        let isExact = false;
+        let isResultCorrect = false;
+        let isTimeCorrect = false;
+        let isGoalScorerCorrect = false;
+
         if (match.type === 'knockout') {
           const actWinner = actHome > actAway ? match.homeTeamId : (actHome < actAway ? match.awayTeamId : match.actualWinnerId);
           const predWinner = predHome > predAway ? match.homeTeamId : (predHome < predAway ? match.awayTeamId : pred.predictedWinnerId);
 
-          let isExact = false;
           if (actHome === predHome && actAway === predAway) {
             if (actHome === actAway) {
               if (actWinner && predWinner && actWinner === predWinner) {
@@ -285,9 +313,14 @@ export class AdminService {
             totalPoints += 10;
           }
 
+          if (actWinner && predWinner && actWinner === predWinner) {
+            isResultCorrect = true;
+          }
+
           // Resolution Time prediction (10 points)
           if (pred.predictedResolutionTime && pred.predictedResolutionTime === match.resolutionTime) {
             totalPoints += 10;
+            isTimeCorrect = true;
           }
         } else {
           const actualHomeWin = actHome > actAway;
@@ -301,6 +334,8 @@ export class AdminService {
           // Correct exact score = 30 points
           if (actHome === predHome && actAway === predAway) {
             totalPoints += 30;
+            isExact = true;
+            isResultCorrect = true;
           }
           // Correct result only = 10 points
           else if (
@@ -309,6 +344,7 @@ export class AdminService {
             (actualDraw && predDraw)
           ) {
             totalPoints += 10;
+            isResultCorrect = true;
           }
         }
 
@@ -318,16 +354,27 @@ export class AdminService {
           if (actHome === 0 && actAway === 0) {
             if (pred.predictedScorerId === 'no-scorer') {
               totalPoints += 10;
+              isGoalScorerCorrect = true;
             }
           } else {
             if (actualScorersList.includes(pred.predictedScorerId)) {
               totalPoints += 10;
+              isGoalScorerCorrect = true;
             }
           }
         }
+
+        if (isExact) exactMatchesCount++;
+        if (isGoalScorerCorrect) goalScorersCount++;
+        if (isResultCorrect) resultsCount++;
+        if (isTimeCorrect) timesCount++;
       }
 
       user.points = totalPoints;
+      user.exactMatches = exactMatchesCount;
+      user.goalScorers = goalScorersCount;
+      user.results = resultsCount;
+      user.times = timesCount;
       await this.userRepository.save(user);
     }
   }

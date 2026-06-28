@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not, IsNull } from 'typeorm';
 import { Team } from '../teams/team.entity';
 import { Match } from '../matches/match.entity';
 import { UserPrediction } from './prediction.entity';
@@ -146,6 +146,10 @@ export class PredictionsService {
         return 'EXISTS ' + subQuery;
       })
       .orderBy('user.points', 'DESC')
+      .addOrderBy('user.exactMatches', 'DESC')
+      .addOrderBy('user.goalScorers', 'DESC')
+      .addOrderBy('user.results', 'DESC')
+      .addOrderBy('user.times', 'DESC')
       .addOrderBy('user.displayName', 'ASC')
       .getMany();
   }
@@ -172,11 +176,103 @@ export class PredictionsService {
       .addOrderBy('user.colorTeam', 'ASC')
       .getRawMany();
 
-    return result.map((row, idx) => ({
-      rank: idx + 1,
+    const mapped = result.map((row) => ({
+      rank: 1,
       colorTeam: row.colorTeam,
       employeeCount: parseInt(row.employeeCount, 10) || 0,
       totalPoints: parseInt(row.totalPoints, 10) || 0,
     }));
+
+    for (let i = 0; i < mapped.length; i++) {
+      let rank = i + 1;
+      for (let j = i - 1; j >= 0; j--) {
+        if (mapped[j].totalPoints === mapped[i].totalPoints) {
+          rank = j + 1;
+        } else {
+          break;
+        }
+      }
+      mapped[i].rank = rank;
+    }
+
+    return mapped;
+  }
+
+  async getPredictionsByMatch(matchId: string): Promise<UserPrediction[]> {
+    const match = await this.matchRepository.findOne({ where: { id: matchId } });
+    if (!match) {
+      throw new NotFoundException(`Match ${matchId} not found.`);
+    }
+
+    // Lock check: Match datetime must have started
+    if (match.dateTime && new Date() < new Date(match.dateTime)) {
+      throw new BadRequestException(`Fixture ${match.id} has not started yet. Predictions are locked.`);
+    }
+
+    return this.predictionRepository.find({
+      where: {
+        matchId,
+        homeScore: Not(IsNull()),
+        awayScore: Not(IsNull()),
+      },
+      relations: ['user'],
+      order: {
+        user: {
+          displayName: 'ASC',
+        },
+      },
+    });
+  }
+
+  async getUserRankAndTrend(userId: string): Promise<{ rank: number | null, trend: 'up' | 'down' | 'stable' | null, previousRank: number | null }> {
+    const leaderboard = await this.getLeaderboard();
+    const userIndex = leaderboard.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      return {
+        rank: null,
+        trend: null,
+        previousRank: user ? user.previousRank : null,
+      };
+    }
+
+    let rank = userIndex + 1;
+    for (let i = userIndex - 1; i >= 0; i--) {
+      if (
+        leaderboard[i].points === leaderboard[userIndex].points &&
+        leaderboard[i].exactMatches === leaderboard[userIndex].exactMatches &&
+        leaderboard[i].goalScorers === leaderboard[userIndex].goalScorers &&
+        leaderboard[i].results === leaderboard[userIndex].results &&
+        leaderboard[i].times === leaderboard[userIndex].times
+      ) {
+        rank = i + 1;
+      } else {
+        break;
+      }
+    }
+
+    const user = leaderboard[userIndex];
+    const previousRank = user.previousRank;
+    let trend: 'up' | 'down' | 'stable' | null = null;
+    
+    if (previousRank !== null && previousRank !== undefined) {
+      if (rank < previousRank) {
+        trend = 'up';
+      } else if (rank > previousRank) {
+        trend = 'down';
+      } else {
+        trend = 'stable';
+      }
+    } else {
+      trend = 'stable';
+    }
+
+    return {
+      rank,
+      trend,
+      previousRank,
+    };
   }
 }
+

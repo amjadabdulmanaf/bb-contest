@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, UseGuards, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PredictionsService } from './predictions.service';
 
@@ -37,5 +37,10 @@ export class PredictionsController {
   @Get('color-leaderboard')
   async getColorLeaderboard() {
     return this.predictionsService.getColorLeaderboard();
+  }
+
+  @Get('match/:matchId')
+  async getMatchPredictions(@Param('matchId') matchId: string) {
+    return this.predictionsService.getPredictionsByMatch(matchId);
   }
 }

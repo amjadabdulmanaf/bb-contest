@@ -1,10 +1,14 @@
 import { Controller, Get, Post, Body, Req, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { PredictionsService } from '../predictions/predictions.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly predictionsService: PredictionsService,
+  ) {}
 
   @Post('login-init')
   @HttpCode(HttpStatus.OK)
@@ -40,8 +44,9 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
-  getProfile(@Req() req: any) {
+  async getProfile(@Req() req: any) {
     const user = req.user;
+    const rankTrend = await this.predictionsService.getUserRankAndTrend(user.id);
     return {
       id: user.id,
       email: user.email,
@@ -49,7 +54,10 @@ export class AuthController {
       empId: user.empId,
       colorTeam: user.colorTeam,
       role: user.role,
-      points: user.points
+      points: user.points,
+      rank: rankTrend.rank,
+      trend: rankTrend.trend,
+      previousRank: rankTrend.previousRank,
     };
   }
 }

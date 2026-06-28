@@ -5,6 +5,7 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { MailService } from '../mail/mail.service';
+import { PredictionsService } from '../predictions/predictions.service';
 
 export interface JwtPayload {
   sub: string;
@@ -21,6 +22,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private mailService: MailService,
+    private predictionsService: PredictionsService,
   ) { }
 
   generateSessionToken(user: any): string {
@@ -39,7 +41,17 @@ export class AuthService {
   async generateRefreshToken(user: any): Promise<string> {
     const payload = { sub: user.id };
     const refreshToken = jwt.sign(payload, this.jwtSecret, { expiresIn: '30d' }); // 30 days refresh token
-    user.refreshTokenHash = this.hashToken(refreshToken);
+    const newHash = this.hashToken(refreshToken);
+    
+    let hashes = user.refreshTokenHashes || [];
+    hashes.push(newHash);
+    
+    // Limit to last 10 concurrent active sessions
+    if (hashes.length > 10) {
+      hashes = hashes.slice(hashes.length - 10);
+    }
+    user.refreshTokenHashes = [...hashes];
+    
     await this.usersService.save(user);
     return refreshToken;
   }
@@ -56,20 +68,25 @@ export class AuthService {
       }
 
       const user = await this.usersService.findById(payload.sub);
-      if (!user || !user.refreshTokenHash) {
+      if (!user || !user.refreshTokenHashes || user.refreshTokenHashes.length === 0) {
         throw new UnauthorizedException('Session expired or inactive.');
       }
 
       const incomingHash = this.hashToken(refreshToken);
-      if (user.refreshTokenHash !== incomingHash) {
-        // Reuse detection: clear database hash and deny refresh
-        user.refreshTokenHash = null;
+      const hashIndex = user.refreshTokenHashes.indexOf(incomingHash);
+      if (hashIndex === -1) {
+        // Reuse detection: clear database hashes and deny refresh
+        user.refreshTokenHashes = [];
         await this.usersService.save(user);
         throw new UnauthorizedException('Refresh token reuse detected. Revoking session.');
       }
 
       // Generate rotated token pair
       const newAccessToken = this.generateSessionToken(user);
+      
+      // Remove old hash before generating the new one to rotate properly
+      user.refreshTokenHashes.splice(hashIndex, 1);
+      user.refreshTokenHashes = [...user.refreshTokenHashes];
       const newRefreshToken = await this.generateRefreshToken(user);
 
       return {
@@ -136,10 +153,11 @@ export class AuthService {
                 ⚽ Quick scoring rules
               </h3>
               <ul style="margin: 0; padding-left: 20px; font-size: 12.5px; color: #94a3b8; line-height: 1.8;">
-                <li><strong style="color: #fff;">Exact Score:</strong> 30 Points</li>
+                <li><strong style="color: #fff;">Exact Score:</strong> 20 Points (added on top of Correct Winner for a total of 30 Points)</li>
                 <li><strong style="color: #fff;">Correct Winner:</strong> 10 Points</li>
-                <li><strong style="color: #fff;">First Goal Scorer:</strong> 10 Points</li>
+                <li><strong style="color: #fff;">Goal Scorer:</strong> 10 Points (excluding shootout goals)</li>
                 <li><strong style="color: #fff;">Resolution Time:</strong> 10 Points (Knockout stage)</li>
+                <li><strong style="color: #fff;">Shootout Rule:</strong> Shootout goals/scorers are for tie-breaking only and are excluded from scorelines and goal scorer points.</li>
               </ul>
             </div>
 
@@ -202,6 +220,7 @@ export class AuthService {
 
     const accessToken = this.generateSessionToken(user);
     const refreshToken = await this.generateRefreshToken(user);
+    const rankTrend = await this.predictionsService.getUserRankAndTrend(user.id);
     return {
       accessToken,
       refreshToken,
@@ -212,7 +231,10 @@ export class AuthService {
         empId: user.empId,
         colorTeam: user.colorTeam,
         role: user.role,
-        points: user.points
+        points: user.points,
+        rank: rankTrend.rank,
+        trend: rankTrend.trend,
+        previousRank: rankTrend.previousRank,
       }
     };
   }

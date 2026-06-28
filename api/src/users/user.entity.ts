@@ -26,14 +26,26 @@ export class User {
   @Column({ default: 0 })
   points: number;
 
+  @Column({ default: 0 })
+  exactMatches: number;
+
+  @Column({ default: 0 })
+  goalScorers: number;
+
+  @Column({ default: 0 })
+  results: number;
+
+  @Column({ default: 0 })
+  times: number;
+
   @Column({ type: 'int', nullable: true })
   previousRank: number | null;
 
   @Column({ type: 'varchar', nullable: true })
   setPasswordToken: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
-  refreshTokenHash: string | null;
+  @Column({ type: 'simple-array', nullable: true })
+  refreshTokenHashes: string[] | null;
 
   @Column({ default: 'user' })
   role: string;
